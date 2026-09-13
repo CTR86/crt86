@@ -12,6 +12,7 @@ import { TerminalWindow } from './os/TerminalWindow'
 import { SettingsWindow } from './os/SettingsWindow'
 import { RoadmapWindow } from './os/RoadmapWindow'
 import { XWindow } from './os/XWindow'
+import { GitHubWindow } from './os/GitHubWindow'
 import { MoneyWindow } from './os/MoneyWindow'
 import { SnakeWindow } from './os/SnakeWindow'
 import { ErrorBoundary } from './design/ErrorBoundary'
@@ -99,6 +100,7 @@ function AppRoutes() {
         <Route path="/faq" element={<LaunchpadModule><FaqWindow /></LaunchpadModule>} />
         <Route path="/roadmap" element={<LaunchpadModule><RoadmapWindow /></LaunchpadModule>} />
         <Route path="/x" element={<LaunchpadModule><XWindow /></LaunchpadModule>} />
+        <Route path="/github" element={<LaunchpadModule><GitHubWindow /></LaunchpadModule>} />
         <Route path="/money" element={<LaunchpadModule><MoneyWindow /></LaunchpadModule>} />
         <Route path="/snake" element={<LaunchpadModule><SnakeWindow /></LaunchpadModule>} />
         <Route path="/perp" element={<ComingSoon exe="PERP.EXE" icon="📈" title="PERPETUALS" desc="Jupiter Perps inside the CRT — long/short SOL, ETH, WBTC with leverage. Keeper-fulfilled, oracle-priced. Engine parked until launch." />} />

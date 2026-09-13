@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { RH_ENABLED } from '../config'
 
 const LINES: string[] = [
@@ -28,8 +28,11 @@ const LINES: string[] = [
 export function OsBoot({ onComplete }: { onComplete: () => void }) {
   const [shown, setShown] = useState(0)
   const [ready, setReady] = useState(false)
+  const [fit, setFit] = useState({ scale: 1, w: 0, h: 0 })
   const finished = useRef(false)
   const armedAt = useRef(Date.now() + 900) // small grace so a stray click doesn't skip instantly
+  const bootRef = useRef<HTMLDivElement>(null)
+  const colRef = useRef<HTMLDivElement>(null)
 
   const finish = () => {
     if (finished.current) return
@@ -63,39 +66,57 @@ export function OsBoot({ onComplete }: { onComplete: () => void }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  /* Scale the POST block to fill the CRT — centered, no huge side gutters, no clip. */
+  useLayoutEffect(() => {
+    const boot = bootRef.current
+    const col = colRef.current
+    if (!boot || !col) return
+
+    const measure = () => {
+      const cw = col.offsetWidth
+      const ch = col.offsetHeight
+      if (cw < 8 || ch < 8) return
+      const sx = (boot.clientWidth - 32) / cw
+      const sy = (boot.clientHeight - 24) / ch
+      const next = Math.min(sx, sy, 3.4)
+      if (!Number.isFinite(next) || next <= 0) return
+      setFit((prev) =>
+        prev.w === cw && prev.h === ch && Math.abs(prev.scale - next) < 0.01
+          ? prev
+          : { scale: next, w: cw, h: ch },
+      )
+    }
+
+    measure()
+    const ro = new ResizeObserver(measure)
+    ro.observe(boot)
+    ro.observe(col)
+    return () => ro.disconnect()
+  }, [shown, ready])
+
   return (
-    <div
-      onClick={finish}
-      style={{
-        position: 'absolute',
-        inset: 0,
-        zIndex: 99,
-        background: 'var(--screen)',
-        padding: 'min(7vw, 64px)',
-        fontFamily: 'var(--font-term)',
-        fontSize: 'clamp(15px, 2.2vw, 21px)',
-        color: 'var(--green)',
-        textShadow: 'var(--glow-green)',
-        cursor: ready ? 'pointer' : 'progress',
-        overflow: 'hidden',
-      }}
-    >
-      {LINES.slice(0, shown).map((l, i) => (
-        <div key={i} style={{ whiteSpace: 'pre-wrap' }}>
-          {l.includes('CRT-DOS 6.86') || l.includes('START DESKTOP') ? (
-            <span style={{ color: 'var(--cyan)', textShadow: 'var(--glow-cyan)' }}>{l}</span>
+    <div ref={bootRef} className="os-boot" onClick={finish} style={{ cursor: ready ? 'pointer' : 'progress' }}>
+      <div
+        className="os-boot-fit"
+        style={fit.w && fit.h ? { width: fit.w * fit.scale, height: fit.h * fit.scale } : undefined}
+      >
+        <div ref={colRef} className="os-boot-col" style={{ transform: `scale(${fit.scale})` }}>
+          {LINES.slice(0, shown).map((l, i) => (
+            <div key={i} className="os-boot-line">
+              {l.includes('CRT-DOS 6.86') || l.includes('START DESKTOP') ? (
+                <span style={{ color: 'var(--cyan)', textShadow: 'var(--glow-cyan)' }}>{l}</span>
+              ) : (
+                l || '\u00A0'
+              )}
+            </div>
+          ))}
+          {ready ? (
+            <div className="os-boot-prompt blink">► PRESS ANY KEY TO ENTER CRT-DOS ◄</div>
           ) : (
-            l || '\u00A0'
+            <span className="blink">▮</span>
           )}
         </div>
-      ))}
-      {ready ? (
-        <div style={{ marginTop: 16, color: 'var(--amber)', textShadow: 'var(--glow-amber)' }} className="blink">
-          ► PRESS ANY KEY TO ENTER CRT-DOS ◄
-        </div>
-      ) : (
-        <span className="blink">▮</span>
-      )}
+      </div>
     </div>
   )
 }

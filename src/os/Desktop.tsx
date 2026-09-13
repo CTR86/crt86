@@ -24,6 +24,7 @@ const FILES: OsFile[] = [
   { exe: 'FAQ.TXT', icon: '📄', route: '/faq', ready: true, desc: 'Read the manual' },
   { exe: 'ROADMAP.EXE', icon: '🗺️', route: '/roadmap', ready: true, desc: 'What ships next' },
   { exe: 'X.EXE', icon: '𝕏', route: '/x', ready: true, desc: '@crt86vibe' },
+  { exe: 'GITHUB.EXE', icon: '🐙', route: '/github', ready: true, desc: 'CTR86/crt86 — source' },
   { exe: 'SNAKE.EXE', icon: '🐍', route: '/snake', ready: true, desc: 'Wire worm — eat bytes, beat your best' },
   { exe: 'SETTINGS.EXE', icon: '⚙️', route: '/settings', ready: true, desc: 'CRT · SFX · night mode' },
 ]

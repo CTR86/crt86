@@ -32,6 +32,8 @@ CRT-DOS 6.86
 ├── BRIDGE.EXE     · Relay — SOL ↔ 7 EVMs (live, tracked)
 ├── TERMINAL.EXE   · Market wire
 ├── SNAKE.EXE      · Wire worm — highscore in localStorage
+├── X.EXE          · @crt86vibe
+├── GITHUB.EXE     · source — github.com/CTR86/crt86
 └── FEE VAULT / PORTFOLIO / HUB / ROADMAP / FAQ
 ```
 
@@ -89,7 +91,7 @@ npm test           # vitest run
 
 **Wallets:** Phantom / Solflare / Backpack (Solana) for launch + fees + perps; any EVM wallet (MetaMask etc.) for Bridge / future RH-Chain.
 
-**Live:** https://www.crt86.com · **X:** https://x.com/crt86vibe
+**Live:** https://www.crt86.com · **X:** https://x.com/crt86vibe · **GitHub:** https://github.com/CTR86/crt86
 
 ---
 

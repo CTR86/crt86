@@ -37,6 +37,7 @@ yarn-error.log*
 # Private / tmp — do not publish
 .zcode/
 brand/
+tmp-verify/
 relay-chains.tmp.json
 *.tmp.json
 coverage/
