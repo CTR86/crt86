@@ -1,0 +1,142 @@
+/* ============================================================
+   CRT86 — base typography & resets
+   ============================================================ */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--void);
+  color: var(--text);
+  font-family: var(--font-term);
+  font-size: 20px;
+  line-height: 1.25;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-pixel);
+  font-weight: 400;
+  margin: 0;
+}
+
+a {
+  color: var(--cyan);
+  text-decoration: none;
+}
+a:hover {
+  text-shadow: var(--glow-cyan);
+}
+
+button {
+  font-family: inherit;
+}
+
+input,
+select,
+textarea {
+  font-family: var(--font-term);
+  font-size: 20px;
+  color: var(--text);
+  background: var(--inset);
+  border: 2px solid var(--line);
+  padding: 6px 10px;
+  border-radius: var(--radius);
+  outline: none;
+}
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--cyan);
+  box-shadow: var(--glow-cyan);
+}
+input::placeholder {
+  color: var(--text-faint);
+}
+select option {
+  background: var(--panel);
+}
+
+::selection {
+  background: var(--pink);
+  color: #000;
+}
+
+/* terminal scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-bright) var(--inset);
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-track {
+  background: var(--inset);
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--line-bright);
+  border: 2px solid var(--inset);
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--pink);
+}
+
+.blink {
+  animation: blink 1s steps(2, start) infinite;
+}
+@keyframes blink {
+  to {
+    visibility: hidden;
+  }
+}
+
+.up {
+  color: var(--green);
+  text-shadow: var(--glow-green);
+}
+.down {
+  color: var(--red);
+  text-shadow: var(--glow-red);
+}
+.dim {
+  color: var(--text-dim);
+}
+.faint {
+  color: var(--text-faint);
+}
+.pixel {
+  font-family: var(--font-pixel);
+}
+.t8 { font-family: var(--font-pixel); font-size: 8px; line-height: 1.6; }
+.t9 { font-family: var(--font-pixel); font-size: 9px; line-height: 1.6; }
+.t10 { font-family: var(--font-pixel); font-size: 10px; line-height: 1.6; }
+.t12 { font-family: var(--font-pixel); font-size: 12px; line-height: 1.6; }
+
+.mono-addr {
+  letter-spacing: 0.5px;
+}
+
+/* hand-emoji cursor terminal-wide (text fields keep the I-beam, disabled keeps blocked) */
+* {
+  cursor: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36'%3E%3Ctext x='4' y='30' font-size='28'%3E👆%3C/text%3E%3C/svg%3E") 18 4, pointer !important;
+}
+input[type='text'],
+input:not([type]),
+textarea {
+  cursor: text !important;
+}
+button:disabled,
+input:disabled,
+select:disabled,
+textarea:disabled {
+  cursor: not-allowed !important;
+}

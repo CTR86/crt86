@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/favicon.svg?v=2" type="image/svg+xml" />
+    <link rel="shortcut icon" href="/favicon.svg?v=2" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/favicon.svg?v=2" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#08010f" />
+    <title>CRT86</title>
+    <style>
+      html, body { background: #08010f; margin: 0; }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script>
+      window.__e = [];
+      window.addEventListener('error', function (e) {
+        window.__e.push(String(e.message) + ' @ ' + String(e.filename).split('/').pop() + ':' + e.lineno);
+      });
+      window.addEventListener('unhandledrejection', function (e) {
+        window.__e.push('REJ: ' + String(e.reason && e.reason.stack ? e.reason.stack : e.reason).slice(0, 300));
+      });
+    </script>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

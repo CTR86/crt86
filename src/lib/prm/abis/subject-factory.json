@@ -1,0 +1,256 @@
+[
+  {
+    "name": "NativeStockOpened",
+    "type": "event",
+    "inputs": [
+      {
+        "type": "bytes32",
+        "name": "subjectId",
+        "indexed": true
+      },
+      {
+        "type": "address",
+        "name": "manager",
+        "indexed": true
+      }
+    ]
+  },
+  {
+    "name": "stockGraduationManager",
+    "type": "function",
+    "stateMutability": "view",
+    "inputs": [],
+    "outputs": [
+      {
+        "type": "address"
+      }
+    ]
+  },
+  {
+    "name": "configureStockGraduation",
+    "type": "function",
+    "stateMutability": "nonpayable",
+    "inputs": [
+      {
+        "type": "address",
+        "name": "manager"
+      }
+    ],
+    "outputs": []
+  },
+  {
+    "name": "StockGraduationConfigured",
+    "type": "event",
+    "inputs": [
+      {
+        "type": "address",
+        "name": "manager",
+        "indexed": true
+      }
+    ]
+  },
+  {
+    "name": "owner",
+    "type": "function",
+    "stateMutability": "view",
+    "inputs": [],
+    "outputs": [
+      {
+        "type": "address"
+      }
+    ]
+  },
+  {
+    "name": "stockCurveBeacon",
+    "type": "function",
+    "stateMutability": "view",
+    "inputs": [],
+    "outputs": [
+      {
+        "type": "address"
+      }
+    ]
+  },
+  {
+    "name": "SubjectOpened",
+    "type": "event",
+    "inputs": [
+      {
+        "type": "bytes32",
+        "name": "subjectId",
+        "indexed": true
+      },
+      {
+        "type": "address",
+        "name": "deskToken",
+        "indexed": true
+      },
+      {
+        "type": "address",
+        "name": "curve",
+        "indexed": true
+      },
+      {
+        "type": "string",
+        "name": "ticker"
+      },
+      {
+        "type": "uint256",
+        "name": "K"
+      },
+      {
+        "type": "uint256",
+        "name": "S"
+      },
+      {
+        "type": "uint256",
+        "name": "openingPriceWethX18"
+      }
+    ]
+  },
+  {
+    "name": "subjectCount",
+    "type": "function",
+    "stateMutability": "view",
+    "inputs": [],
+    "outputs": [
+      {
+        "type": "uint256"
+      }
+    ]
+  },
+  {
+    "name": "subjectIds",
+    "type": "function",
+    "stateMutability": "view",
+    "inputs": [
+      {
+        "type": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "bytes32"
+      }
+    ]
+  },
+  {
+    "name": "getSubject",
+    "type": "function",
+    "stateMutability": "view",
+    "inputs": [
+      {
+        "type": "bytes32",
+        "name": "subjectId"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "tuple",
+        "components": [
+          {
+            "type": "address",
+            "name": "deskToken"
+          },
+          {
+            "type": "address",
+            "name": "curve"
+          },
+          {
+            "type": "uint256",
+            "name": "K"
+          },
+          {
+            "type": "uint256",
+            "name": "S"
+          },
+          {
+            "type": "uint256",
+            "name": "openingPriceWethX18"
+          },
+          {
+            "type": "uint64",
+            "name": "openedAt"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "openSubject",
+    "type": "function",
+    "stateMutability": "nonpayable",
+    "inputs": [
+      {
+        "type": "tuple",
+        "name": "input",
+        "components": [
+          {
+            "type": "bytes32",
+            "name": "subjectId"
+          },
+          {
+            "type": "string",
+            "name": "companyName"
+          },
+          {
+            "type": "string",
+            "name": "ticker"
+          },
+          {
+            "type": "string",
+            "name": "issuerId"
+          },
+          {
+            "type": "string",
+            "name": "metadataURI"
+          },
+          {
+            "type": "uint256",
+            "name": "stockPriceUsdX18"
+          },
+          {
+            "type": "uint256",
+            "name": "totalSupply"
+          },
+          {
+            "type": "uint256",
+            "name": "deskSupply"
+          }
+        ]
+      }
+    ],
+    "outputs": [
+      {
+        "type": "address",
+        "name": "token"
+      },
+      {
+        "type": "address",
+        "name": "curve"
+      }
+    ]
+  },
+  {
+    "name": "oracle",
+    "type": "function",
+    "stateMutability": "view",
+    "inputs": [],
+    "outputs": [
+      {
+        "type": "address"
+      }
+    ]
+  },
+  {
+    "name": "feeEscrow",
+    "type": "function",
+    "stateMutability": "view",
+    "inputs": [],
+    "outputs": [
+      {
+        "type": "address"
+      }
+    ]
+  }
+]

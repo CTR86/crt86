@@ -1,0 +1,80 @@
+/* ============================================================
+   CRT86 — design tokens
+   ============================================================ */
+:root {
+  /* deep space */
+  --void: #08010f;
+  --screen: #0b0217;
+  --panel: #12042b;
+  --panel-2: #1a0638;
+  --panel-3: #241049;
+  --inset: #05010c;
+
+  --line: #3b1a6e;
+  --line-soft: #2a104f;
+  --line-bright: #6a3fb5;
+
+  /* neon */
+  --pink: #ff2a6d;
+  --cyan: #05d9e8;
+  --purple: #d300c5;
+  --amber: #ffb703;
+  --green: #39ff14;
+  --red: #ff3131;
+
+  /* text */
+  --text: #e8dcff;
+  --text-dim: #9d7fd4;
+  --text-faint: #6b4fa8;
+
+  --font-pixel: 'Press Start 2P', 'Courier New', monospace;
+  --font-term: 'VT323', 'Courier New', monospace;
+
+  --glow-pink: 0 0 6px rgba(255, 42, 109, 0.9), 0 0 20px rgba(255, 42, 109, 0.45);
+  --glow-cyan: 0 0 6px rgba(5, 217, 232, 0.9), 0 0 20px rgba(5, 217, 232, 0.4);
+  --glow-green: 0 0 8px rgba(57, 255, 20, 0.55);
+  --glow-amber: 0 0 8px rgba(255, 183, 7, 0.5);
+  --glow-red: 0 0 8px rgba(255, 49, 49, 0.6);
+  --glow-purple: 0 0 8px rgba(211, 0, 197, 0.55);
+
+  --radius: 4px;
+}
+
+/* ============================================================
+   NIGHT MODE — monochrome phosphor (black & white UI/UX)
+   Token remap keeps the brightness hierarchy (up = bright white,
+   down = dim gray); the grayscale filter catches canvas, images
+   and any raw-hex accents the tokens don't reach.
+   ============================================================ */
+body.night {
+  filter: grayscale(1) contrast(1.06) brightness(1.04);
+
+  --void: #000000;
+  --screen: #050505;
+  --panel: #0a0a0a;
+  --panel-2: #101010;
+  --panel-3: #181818;
+  --inset: #030303;
+
+  --line: #303030;
+  --line-soft: #222222;
+  --line-bright: #4f4f4f;
+
+  --pink: #f5f5f5;
+  --cyan: #cfcfcf;
+  --purple: #9a9a9a;
+  --amber: #d9d9d9;
+  --green: #ffffff;
+  --red: #6f6f6f;
+
+  --text: #f2f2f2;
+  --text-dim: #9a9a9a;
+  --text-faint: #616161;
+
+  --glow-pink: 0 0 6px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 255, 255, 0.35);
+  --glow-cyan: 0 0 6px rgba(255, 255, 255, 0.6), 0 0 18px rgba(255, 255, 255, 0.28);
+  --glow-green: 0 0 8px rgba(255, 255, 255, 0.6);
+  --glow-amber: 0 0 8px rgba(255, 255, 255, 0.45);
+  --glow-red: 0 0 8px rgba(255, 255, 255, 0.25);
+  --glow-purple: 0 0 8px rgba(255, 255, 255, 0.35);
+}

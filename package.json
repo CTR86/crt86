@@ -1,0 +1,36 @@
+{
+  "name": "crt86",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@fontsource/press-start-2p": "^5.2.5",
+    "@fontsource/vt323": "^5.2.5",
+    "@meteora-ag/dynamic-bonding-curve-sdk": "^1.5.12",
+    "@solana/web3.js": "^1.98.4",
+    "@tanstack/react-query": "^5.90.2",
+    "bn.js": "^5.2.5",
+    "bs58": "^6.0.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "react-router-dom": "^7.9.3",
+    "viem": "^2.38.3",
+    "zustand": "^5.0.8"
+  },
+  "devDependencies": {
+    "@types/bn.js": "^5.2.0",
+    "@types/react": "^19.1.16",
+    "@types/react-dom": "^19.1.9",
+    "@vitejs/plugin-react": "^5.0.4",
+    "typescript": "~5.9.3",
+    "vite": "^7.1.9",
+    "vitest": "^5.0.0"
+  }
+}

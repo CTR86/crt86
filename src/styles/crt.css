@@ -1,0 +1,232 @@
+/* ============================================================
+   CRT86 — the CRT monitor shell & screen effects
+   ============================================================ */
+
+html {
+  overflow: hidden; /* all scrolling lives inside the CRT screen */
+}
+
+/* the room the monitor sits in */
+.crt-room {
+  height: 100dvh;
+  width: 100%;
+  padding: 22px;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  overflow-x: clip; /* the transformed floor grid must not widen the page */
+  background:
+    radial-gradient(ellipse 120% 90% at 50% -10%, #1c0640 0%, transparent 55%),
+    radial-gradient(ellipse 100% 60% at 50% 115%, rgba(211, 0, 197, 0.14) 0%, transparent 60%),
+    var(--void);
+  position: relative;
+}
+
+/* synthwave floor grid, only visible around bezel edges */
+.crt-room::before {
+  content: '';
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 26%;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 42, 109, 0.12) 0 2px, transparent 2px 64px),
+    repeating-linear-gradient(0deg, rgba(5, 217, 232, 0.1) 0 2px, transparent 2px 44px);
+  transform: perspective(420px) rotateX(58deg) scale(1.6);
+  transform-origin: bottom;
+  mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+  -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+}
+
+/* the monitor bezel */
+.crt-bezel {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  border-radius: 22px;
+  padding: 16px;
+  background:
+    linear-gradient(180deg, #241033 0%, #170a26 40%, #0e0518 100%);
+  border: 1px solid #3d2452;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -3px 8px rgba(0, 0, 0, 0.8),
+    0 0 0 6px #0a0413,
+    0 0 45px rgba(211, 0, 197, 0.25),
+    0 24px 60px rgba(0, 0, 0, 0.85);
+  display: flex;
+  flex-direction: column;
+}
+
+/* power LED + brand plate on the bezel */
+.crt-bezel::after {
+  content: 'CRT86 SYSTEMS · MODEL 86';
+  position: absolute;
+  bottom: 4px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: var(--font-pixel);
+  font-size: 6px;
+  letter-spacing: 3px;
+  color: #57406f;
+  pointer-events: none;
+}
+
+.crt-screen {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 140% 110% at 50% 45%, #160a30 0%, var(--screen) 58%, #060111 100%);
+  box-shadow:
+    inset 0 0 40px rgba(0, 0, 0, 0.85),
+    inset 0 0 6px rgba(120, 60, 220, 0.35);
+  display: flex;
+  flex-direction: column;
+}
+
+/* scanlines */
+.crt-screen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.22) 0px,
+    rgba(0, 0, 0, 0.22) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  mix-blend-mode: multiply;
+}
+
+/* vignette + curvature shading + refresh band */
+.crt-screen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 91;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      115deg,
+      rgba(255, 255, 255, 0.05) 0%,
+      transparent 22%,
+      transparent 78%,
+      rgba(0, 0, 0, 0.22) 100%
+    ),
+    radial-gradient(ellipse at center, transparent 58%, rgba(2, 0, 8, 0.5) 100%);
+}
+
+/* sweeping refresh band */
+.crt-band {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 90px;
+  z-index: 92;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    rgba(120, 200, 255, 0.045),
+    transparent
+  );
+  animation: crt-band-sweep 9s linear infinite;
+}
+@keyframes crt-band-sweep {
+  from { top: -15%; }
+  to { top: 110%; }
+}
+
+/* phosphor flicker */
+.crt-flicker {
+  animation: crt-flicker 4.2s infinite;
+}
+@keyframes crt-flicker {
+  0%, 100% { opacity: 1; }
+  3% { opacity: 0.982; }
+  4% { opacity: 1; }
+  41% { opacity: 1; }
+  42% { opacity: 0.97; }
+  43% { opacity: 1; }
+  78% { opacity: 0.988; }
+  79% { opacity: 1; }
+}
+
+/* the scrollable screen surface */
+.crt-content {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* chrome logo text */
+.chrome-logo {
+  font-family: var(--font-pixel);
+  background: linear-gradient(
+    180deg,
+    #ffffff 0%,
+    #d9f4ff 28%,
+    #7ae7ff 46%,
+    #ff2a6d 62%,
+    #d300c5 80%,
+    #61189a 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  filter:
+    drop-shadow(0 0 6px rgba(255, 42, 109, 0.55))
+    drop-shadow(0 2px 0 rgba(0, 0, 0, 0.9));
+}
+
+/* chromatic aberration utility (labels, marquee) */
+.aberrate {
+  text-shadow:
+    -1.5px 0 rgba(5, 217, 232, 0.55),
+    1.5px 0 rgba(255, 42, 109, 0.55);
+}
+
+/* hyper mode (konami) */
+.crt-room.hyper .crt-bezel {
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.1),
+    0 0 0 6px #0a0413,
+    0 0 90px rgba(255, 42, 109, 0.6),
+    0 0 30px rgba(5, 217, 232, 0.5);
+  animation: hyper-pulse 0.6s steps(2) infinite;
+}
+@keyframes hyper-pulse {
+  50% { filter: hue-rotate(24deg) brightness(1.06); }
+}
+
+/* effects off: kill heavy layers */
+body.fx-off .crt-screen::before,
+body.fx-off .crt-screen::after,
+body.fx-off .crt-band {
+  display: none;
+}
+body.fx-off .crt-flicker {
+  animation: none;
+}
+body.fx-off .crt-room::before {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  .crt-room { padding: 8px; }
+  .crt-bezel { padding: 8px; border-radius: 14px; }
+  .crt-bezel::after { display: none; }
+}

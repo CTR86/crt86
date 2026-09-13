@@ -1,0 +1,121 @@
+[
+  {
+    "name": "Transfer",
+    "type": "event",
+    "inputs": [
+      {
+        "type": "address",
+        "name": "from",
+        "indexed": true
+      },
+      {
+        "type": "address",
+        "name": "to",
+        "indexed": true
+      },
+      {
+        "type": "uint256",
+        "name": "value"
+      }
+    ]
+  },
+  {
+    "name": "name",
+    "type": "function",
+    "stateMutability": "view",
+    "inputs": [],
+    "outputs": [
+      {
+        "type": "string"
+      }
+    ]
+  },
+  {
+    "name": "symbol",
+    "type": "function",
+    "stateMutability": "view",
+    "inputs": [],
+    "outputs": [
+      {
+        "type": "string"
+      }
+    ]
+  },
+  {
+    "name": "decimals",
+    "type": "function",
+    "stateMutability": "view",
+    "inputs": [],
+    "outputs": [
+      {
+        "type": "uint8"
+      }
+    ]
+  },
+  {
+    "name": "totalSupply",
+    "type": "function",
+    "stateMutability": "view",
+    "inputs": [],
+    "outputs": [
+      {
+        "type": "uint256"
+      }
+    ]
+  },
+  {
+    "name": "balanceOf",
+    "type": "function",
+    "stateMutability": "view",
+    "inputs": [
+      {
+        "type": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "uint256"
+      }
+    ]
+  },
+  {
+    "name": "allowance",
+    "type": "function",
+    "stateMutability": "view",
+    "inputs": [
+      {
+        "type": "address",
+        "name": "owner"
+      },
+      {
+        "type": "address",
+        "name": "spender"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "uint256"
+      }
+    ]
+  },
+  {
+    "name": "approve",
+    "type": "function",
+    "stateMutability": "nonpayable",
+    "inputs": [
+      {
+        "type": "address",
+        "name": "spender"
+      },
+      {
+        "type": "uint256",
+        "name": "amount"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "bool"
+      }
+    ]
+  }
+]
