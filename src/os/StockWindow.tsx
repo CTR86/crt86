@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Panel } from '../design/ui'
-import { useStockHolidays, useStockMarkets, useStockTickers, useStockUniverse } from '../hooks/stock'
+import { useBpBalances, useBpRfqs, useBpStatus, useStockHolidays, useStockMarkets, useStockTickers, useStockUniverse } from '../hooks/stock'
 import { num, rfqSymbol, tickerForAsset, type Security } from '../lib/backpack/api'
+import { acceptBpQuote, bestQuote, cancelBpRfq, rfqIdOf, submitBpRfq } from '../lib/backpack/trade'
 import { currentSession, sessionForSecurity, sessionLabel, type SessionId } from '../lib/backpack/session'
 import { cn, fmtPrice } from '../lib/format'
 import { play } from '../sound/sfx'
@@ -32,6 +33,12 @@ export function StockWindow() {
   const [now, setNow] = useState(() => Date.now())
   const [qty, setQty] = useState('1')
   const [side, setSide] = useState<'Bid' | 'Ask'>('Bid')
+  const [busy, setBusy] = useState(false)
+  const [note, setNote] = useState<string | null>(null)
+  const statusQ = useBpStatus()
+  const keyed = !!statusQ.data?.configured
+  const balQ = useBpBalances(keyed)
+  const rfqQ = useBpRfqs(keyed)
 
   useEffect(() => {
     const iv = setInterval(() => setNow(Date.now()), 15_000)
@@ -101,7 +108,9 @@ export function StockWindow() {
           </span>
         </span>
         <span className="faint" style={{ fontSize: 14 }}>
-          tokenized US equities · RFQ in session · spot book after hours when listed
+          {keyed ? `ACCOUNT ${statusQ.data?.name ?? 'crt2'}` : 'ACCOUNT — KEY NOT LOADED'}
+          {' · '}
+          tokenized US equities · RFQ in session
         </span>
         <button
           className="bevel-btn b-sm b-cyan"
@@ -219,6 +228,18 @@ export function StockWindow() {
                   {open ? 'No size band for this session.' : 'Market closed — RFQ sleeps. Listed names can still print on the spot book after hours.'}
                 </div>
               )}
+              {keyed ? (
+                <>
+                  <div className="stat-row">
+                    <span className="sk">USDC</span>
+                    <span className="sv">{balQ.data?.USDC?.available ?? '—'}</span>
+                  </div>
+                  <div className="stat-row">
+                    <span className="sk">{tapeTicker(selected.asset)}</span>
+                    <span className="sv">{balQ.data?.[selected.asset]?.available ?? '0'}</span>
+                  </div>
+                </>
+              ) : null}
 
               <div style={{ display: 'flex', gap: 8, marginTop: 6 }}>
                 <button className={cn('bevel-btn b-sm', side === 'Bid' && 'b-cyan')} onClick={() => setSide('Bid')}>
@@ -234,11 +255,92 @@ export function StockWindow() {
                 onChange={(e) => setQty(e.target.value.replace(/[^0-9.]/g, ''))}
                 placeholder="SHARES"
               />
-              <button className="bevel-btn b-lg" disabled title="Backpack ED25519 API key not loaded">
-                REQUEST QUOTE — KEY NOT LOADED
+              <button
+                className="bevel-btn b-lg"
+                disabled={!keyed || busy || !qty}
+                onClick={() => {
+                  if (!selected || !keyed) return
+                  setBusy(true)
+                  setNote(null)
+                  play('launch')
+                  void submitBpRfq({ symbol: rfqSymbol(selected.asset), side, quantity: qty })
+                    .then(() => {
+                      setNote('RFQ LIVE — waiting on broker quote')
+                      play('coin')
+                      void rfqQ.refetch()
+                      void balQ.refetch()
+                    })
+                    .catch((e: Error) => {
+                      setNote(e.message)
+                      play('error')
+                    })
+                    .finally(() => setBusy(false))
+                }}
+              >
+                {busy ? 'SIGNING…' : keyed ? `REQUEST QUOTE — ${side === 'Bid' ? 'BUY' : 'SELL'}` : 'REQUEST QUOTE — KEY NOT LOADED'}
               </button>
+              {note ? <div className="faint" style={{ fontSize: 15, color: 'var(--amber)' }}>{note}</div> : null}
+              {(rfqQ.data ?? []).length > 0 ? (
+                <div style={{ marginTop: 6 }}>
+                  <div className="t8 dim" style={{ marginBottom: 4 }}>OPEN RFQs</div>
+                  {(rfqQ.data ?? []).map((row) => {
+                    const id = rfqIdOf(row)
+                    const qte = bestQuote(row)
+                    const px = side === 'Ask' ? qte?.bidPrice : qte?.askPrice
+                    return (
+                      <div key={id || JSON.stringify(row.rfq)} className="stat-row" style={{ alignItems: 'center' }}>
+                        <span className="sk">{String(row.rfq.symbol ?? id).replace('_USDC_RFQ', '')}</span>
+                        <span className="sv" style={{ display: 'inline-flex', gap: 8, alignItems: 'center' }}>
+                          {qte ? `Q ${px ?? '—'}` : (row.rfq.status ?? 'OPEN')}
+                          {qte?.quoteId && id ? (
+                            <button
+                              className="bevel-btn b-sm b-cyan"
+                              disabled={busy}
+                              onClick={() => {
+                                setBusy(true)
+                                setNote(null)
+                                void acceptBpQuote({ rfqId: id, quoteId: String(qte.quoteId) })
+                                  .then(() => {
+                                    setNote('QUOTE ACCEPTED — settlement pending')
+                                    play('win')
+                                    void rfqQ.refetch()
+                                    void balQ.refetch()
+                                  })
+                                  .catch((e: Error) => {
+                                    setNote(e.message)
+                                    play('error')
+                                  })
+                                  .finally(() => setBusy(false))
+                              }}
+                            >
+                              ACCEPT
+                            </button>
+                          ) : id ? (
+                            <button
+                              className="bevel-btn b-sm"
+                              disabled={busy}
+                              onClick={() => {
+                                setBusy(true)
+                                void cancelBpRfq(id)
+                                  .then(() => {
+                                    setNote('RFQ CANCELLED')
+                                    void rfqQ.refetch()
+                                  })
+                                  .catch((e: Error) => setNote(e.message))
+                                  .finally(() => setBusy(false))
+                              }}
+                            >
+                              CANCEL
+                            </button>
+                          ) : null}
+                        </span>
+                      </div>
+                    )
+                  })}
+                </div>
+              ) : null}
               <div className="faint" style={{ fontSize: 14 }}>
-                Session hours: RFQ `{rfqSymbol(selected.asset)}` (qty in the stock, not USDC). After hours, listed names use the spot book. No fake fills — the key signs on the server, never in the CRT bundle.
+                Key `{statusQ.data?.name ?? 'crt2'}` signs on the server. RFQ qty is shares, not USDC. No fake fills.
               </div>
             </div>
           ) : (

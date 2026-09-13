@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { getMarketHolidays, getMarketSessions, getMarkets, getSecurities, getTickers } from '../lib/backpack/api'
+import { getBpBalances, getBpRfqs, getBpStatus } from '../lib/backpack/trade'
 
 export function useStockUniverse() {
   return useQuery({
@@ -40,5 +41,33 @@ export function useStockTickers() {
     queryFn: getTickers,
     staleTime: 8_000,
     refetchInterval: 12_000,
+  })
+}
+
+export function useBpStatus() {
+  return useQuery({
+    queryKey: ['bp-status'],
+    queryFn: getBpStatus,
+    staleTime: 30_000,
+  })
+}
+
+export function useBpBalances(enabled: boolean) {
+  return useQuery({
+    queryKey: ['bp-balances'],
+    queryFn: getBpBalances,
+    enabled,
+    staleTime: 8_000,
+    refetchInterval: enabled ? 12_000 : false,
+  })
+}
+
+export function useBpRfqs(enabled: boolean) {
+  return useQuery({
+    queryKey: ['bp-rfqs'],
+    queryFn: getBpRfqs,
+    enabled,
+    staleTime: 2_000,
+    refetchInterval: enabled ? 3_000 : false,
   })
 }
