@@ -16,6 +16,7 @@ interface OsFile {
 const FILES: OsFile[] = [
   { exe: 'LAUNCHPAD.EXE', icon: '🚀', route: '/launchpad', ready: true, desc: 'Multi-engine coin launcher' },
   { exe: 'MONEY.EXE', icon: '💰', route: '/money', ready: true, desc: 'Official coin — contract address' },
+  { exe: 'STOCK.EXE', icon: '📊', route: '/stock', ready: true, desc: 'Backpack tokenized stocks — tape' },
   { exe: 'PERP.EXE', icon: '📈', route: '/perp', ready: false, desc: 'Jupiter Perps — long/short SOL/ETH/WBTC' },
   { exe: 'GACHA.EXE', icon: '🎰', route: '/gacha', ready: false, desc: 'On-chain gacha — pull, reveal, flex' },
   { exe: 'DEX.EXE', icon: '💱', route: '/dex', ready: false, desc: 'Decentralized exchange' },

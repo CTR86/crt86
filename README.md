@@ -26,6 +26,7 @@ This repo is the **public, decentralized release** of the CRT86 frontend. Commun
 CRT-DOS 6.86
 ├── LAUNCHPAD.EXE  · Multi-engine launcher (StonkFun + Ember + Meteora DBC)
 ├── MONEY.EXE      · Official coin — CA verified on Solscan
+├── STOCK.EXE      · Backpack tokenized US stocks — public tape; RFQ waits for key
 ├── PERP.EXE       · Jupiter Perps (SOL/ETH/WBTC long/short, parked as SOON)
 ├── GACHA.EXE      · On-chain gacha pulls (parked as SOON)
 ├── DEX.EXE        · Spot swap/chart/snipe (parked as SOON)
@@ -47,6 +48,7 @@ CRT-DOS 6.86
 |---|---|---|
 | **Launchpad** | Live | StonkFun `api/public/v1` + Ember (`embercurve.fun`) + Meteora DBC `dbcij3LW...` · `ZERO PLATFORM FEE` · wallet `signTx` → platform broadcast |
 | **Money.exe** | Live | Official CA `Dbjy6uN3DNxn1NdnM1sKrMXb5XXkuWrM5yuL1PqDpump` · Pump/Solscan links |
+| **Stock.exe** | Live (tape) | Backpack `api.backpack.exchange` via `/backpack` rewrite · securities + sessions + tickers · RFQ trade waits for server-side ED25519 key |
 | **Bridge.exe** | Live | Relay `api.relay.link` · `SOLANA 792703809 ↔ EVM` · quote → confirm → `signTx` → `sendRawTransaction` → `waitForRelayFill` |
 | **Terminal / Hub / Portfolio / Fee Vault** | Live | `@tanstack/react-query` polling, block-chart `Scope` canvas |
 | **Perp.exe** | `SOON` (parked) | Jupiter Perps `PERPHjGBq...` · pool `5BUwFW4...` · custody `7xS2gz...` · `price.jup.ag → coingecko → binance` fallback |

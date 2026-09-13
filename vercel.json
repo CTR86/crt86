@@ -6,6 +6,7 @@
   "rewrites": [
     { "source": "/ember/:path*", "destination": "https://embercurve.fun/:path*" },
     { "source": "/jup-perps/:path*", "destination": "https://perps-api.jup.ag/:path*" },
-    { "source": "/jup-price/:path*", "destination": "https://price.jup.ag/:path*" }
+    { "source": "/jup-price/:path*", "destination": "https://price.jup.ag/:path*" },
+    { "source": "/backpack/:path*", "destination": "https://api.backpack.exchange/:path*" }
   ]
 }

@@ -19,6 +19,7 @@ const LINES: string[] = [
   'DEX.EXE ........................ QUEUED',
   'BRIDGE.EXE ..................... QUEUED',
   'TERMINAL.EXE ................... QUEUED',
+  'STOCK.EXE ...................... OK',
   'CALIBRATING PHOSPHOR ........... OK',
   '',
   "C:\\CRT-DOS\\> START DESKTOP.EXE",

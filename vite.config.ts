@@ -16,6 +16,11 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (p) => p.replace(/^\/ember/, ''),
       },
+      '/backpack': {
+        target: 'https://api.backpack.exchange',
+        changeOrigin: true,
+        rewrite: (p) => p.replace(/^\/backpack/, ''),
+      },
     },
   },
 })
