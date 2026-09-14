@@ -4,6 +4,7 @@ import type { IncomingMessage, ServerResponse } from 'node:http'
 import { defineConfig, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import bpHandler from './api/bp.mjs'
+import jupHandler from './api/jup.mjs'
 
 function loadServerEnv() {
   const p = path.resolve('.env.local')
@@ -14,7 +15,8 @@ function loadServerEnv() {
     const i = t.indexOf('=')
     if (i < 1) continue
     const k = t.slice(0, i).trim()
-    if (k.startsWith('VITE_')) continue
+    // Server proxy needs the Jupiter key in dev too — allowlist only that var.
+    if (k.startsWith('VITE_') && k !== 'VITE_JUPITER_API_KEY') continue
     let v = t.slice(i + 1).trim()
     if ((v.startsWith('"') && v.endsWith('"')) || (v.startsWith("'") && v.endsWith("'"))) v = v.slice(1, -1)
     if (!process.env[k]) process.env[k] = v
@@ -28,6 +30,9 @@ function backpackApiPlugin(): Plugin {
       loadServerEnv()
       server.middlewares.use('/api/bp', (req: IncomingMessage, res: ServerResponse, next) => {
         void Promise.resolve(bpHandler(req, res)).catch(next)
+      })
+      server.middlewares.use('/api/jup', (req: IncomingMessage, res: ServerResponse, next) => {
+        void Promise.resolve(jupHandler(req, res)).catch(next)
       })
     },
   }

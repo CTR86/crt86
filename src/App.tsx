@@ -15,6 +15,7 @@ import { XWindow } from './os/XWindow'
 import { GitHubWindow } from './os/GitHubWindow'
 import { StockWindow } from './os/StockWindow'
 import { MoneyWindow } from './os/MoneyWindow'
+import { DexWindow } from './os/DexWindow'
 import { SnakeWindow } from './os/SnakeWindow'
 import { ErrorBoundary } from './design/ErrorBoundary'
 import { MobileNotice } from './design/MobileNotice'
@@ -109,7 +110,7 @@ function AppRoutes() {
         <Route path="/gacha" element={<ComingSoon exe="GACHA.EXE" icon="🎰" title="GACHA TERMINAL" desc="On-chain gacha pulls — capsules, odds, reveals and rarity flex. Feed the machine, chase the holographic." />} />
         <Route path="/settings" element={<LaunchpadModule><SettingsWindow /></LaunchpadModule>} />
         <Route path="/launchpad/trade" element={RH_ENABLED ? <LaunchpadModule><TradeTerminal /></LaunchpadModule> : <Navigate to="/launchpad" replace />} />
-        <Route path="/dex" element={<ComingSoon exe="DEX.EXE" icon="💱" title="DECENTRALIZED EXCHANGE" desc="Swap, chart and snipe — all inside the CRT. Solana pairs first, more markets after." />} />
+        <Route path="/dex" element={<LaunchpadModule><DexWindow /></LaunchpadModule>} />
         <Route path="/bridge" element={<LaunchpadModule><BridgeWindow /></LaunchpadModule>} />
         <Route path="/terminal" element={<LaunchpadModule><TerminalWindow /></LaunchpadModule>} />
         <Route path="/launch" element={<Navigate to="/launchpad/launch" replace />} />

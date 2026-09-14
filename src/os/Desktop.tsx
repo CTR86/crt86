@@ -19,7 +19,7 @@ const FILES: OsFile[] = [
   { exe: 'STOCK.EXE', icon: '📊', route: '/stock', ready: true, desc: 'Backpack tokenized stocks — tape' },
   { exe: 'PERP.EXE', icon: '📈', route: '/perp', ready: false, desc: 'Jupiter Perps — long/short SOL/ETH/WBTC' },
   { exe: 'GACHA.EXE', icon: '🎰', route: '/gacha', ready: false, desc: 'On-chain gacha — pull, reveal, flex' },
-  { exe: 'DEX.EXE', icon: '💱', route: '/dex', ready: false, desc: 'Decentralized exchange' },
+  { exe: 'DEX.EXE', icon: '💱', route: '/dex', ready: true, desc: 'Jupiter-powered Solana swaps' },
   { exe: 'BRIDGE.EXE', icon: '🌉', route: '/bridge', ready: true, desc: 'Cross-chain bridge · Relay' },
   { exe: 'TERMINAL.EXE', icon: '📟', route: '/terminal', ready: true, desc: 'Market wire — glaze the movers' },
   { exe: 'FAQ.TXT', icon: '📄', route: '/faq', ready: true, desc: 'Read the manual' },
