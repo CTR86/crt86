@@ -1,11 +1,14 @@
 import { describe, it, expect } from 'vitest'
 import {
   fromBaseUnits,
+  friendlyQuoteError,
   isQuoteStale,
+  isTransientFetchError,
   isWalletRejection,
   mapExecuteError,
   mapOrderError,
   parseOrder,
+  shouldFallbackStatus,
   toBaseUnits,
   validateSwapInput,
   type OrderResponse,
@@ -88,6 +91,36 @@ describe('dex jupiter errors', () => {
   it('detects wallet rejection', () => {
     expect(isWalletRejection('User rejected the request')).toBe(true)
     expect(isWalletRejection('Transaction failed on-chain')).toBe(false)
+  })
+})
+
+describe('dex transport resilience', () => {
+  it('treats timeouts and aborts as transient (must fall back, never die)', () => {
+    expect(isTransientFetchError('signal timed out')).toBe(true)
+    expect(isTransientFetchError('The operation timed out')).toBe(true)
+    expect(isTransientFetchError('Failed to fetch')).toBe(true)
+    expect(isTransientFetchError('socket hang up')).toBe(true)
+    expect(isTransientFetchError('Jupiter quote HTTP 503')).toBe(true)
+  })
+
+  it('treats definitive errors as non-transient', () => {
+    expect(isTransientFetchError('Invalid amount — digits and one dot only.')).toBe(false)
+    expect(isTransientFetchError('Jupiter quote HTTP 400')).toBe(false)
+    expect(isTransientFetchError('Amount must be greater than zero.')).toBe(false)
+  })
+
+  it('falls back on proxy-missing / rate-limit / server errors only', () => {
+    expect(shouldFallbackStatus(404)).toBe(true)
+    expect(shouldFallbackStatus(429)).toBe(true)
+    expect(shouldFallbackStatus(504)).toBe(true)
+    expect(shouldFallbackStatus(400)).toBe(false)
+    expect(shouldFallbackStatus(403)).toBe(false)
+  })
+
+  it('maps aborts to an actionable RE-QUOTE message', () => {
+    expect(friendlyQuoteError('signal timed out')).toMatch(/RE-QUOTE/)
+    expect(friendlyQuoteError('Failed to fetch')).toMatch(/RE-QUOTE/)
+    expect(friendlyQuoteError('Insufficient funds — x')).toBe('Insufficient funds — x')
   })
 })
 

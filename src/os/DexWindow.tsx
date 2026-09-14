@@ -22,6 +22,7 @@ import {
   searchTokens,
   toBaseUnits,
   validateSwapInput,
+  friendlyQuoteError,
   type DexToken,
   type ExecuteResponse,
   type OrderResponse,
@@ -267,7 +268,7 @@ export function DexWindow() {
       if (p.priceImpactPct != null) log(`IMPACT ${p.priceImpactPct >= 0 ? '+' : ''}${p.priceImpactPct.toFixed(3)}%`)
     } catch (e) {
       const m = String((e as Error).message ?? e)
-      setErr(m.slice(0, 420))
+      setErr(friendlyQuoteError(m))
       setPhase('error')
       play('error')
       log('QUOTE FAILED — ' + m.slice(0, 120))

@@ -230,11 +230,56 @@ export function isQuoteStale(fetchedAt: number, expireAtMs: number | null): bool
   return Date.now() - fetchedAt > QUOTE_STALE_AFTER_MS
 }
 
-/* ---------- transport: proxy-first, direct fallback ---------- */
+/* ---------- transport: proxy-first, direct fallback + one auto-retry ---------- */
+/** Transient = worth retrying on the other path (timeout, reset, rate-limit, bad gateway). */
+export function isTransientFetchError(msg: string): boolean {
+  return /timed out|timeout|abort|failed to fetch|load failed|networkerror|network error|econnreset|socket hang up|429|50[0-4]|gateway|temporarily|try again/i.test(msg)
+}
+
+/** Proxy statuses that should fall through to direct api.jup.ag instead of failing. */
+export function shouldFallbackStatus(status: number): boolean {
+  return status === 404 || status === 408 || status === 425 || status === 429 || status >= 500
+}
+
+/** Raw fetch aborts read badly on a CRT — map them to actionable one-liners. */
+export function friendlyQuoteError(msg: string): string {
+  if (/timed out|timeout/i.test(msg)) {
+    return 'Quote timed out — the Jupiter route is slow right now. Tap RE-QUOTE to retry.'
+  }
+  if (/failed to fetch|load failed|networkerror|network error|econnreset|socket hang/i.test(msg)) {
+    return 'Network hiccup reaching Jupiter. Tap RE-QUOTE to retry.'
+  }
+  return msg.length > 420 ? msg.slice(0, 420) : msg
+}
+
 async function fetchJson(url: string, init?: RequestInit): Promise<{ ok: boolean; status: number; json: unknown }> {
   const r = await fetch(url, init)
   const json = await r.json().catch(() => null)
   return { ok: r.ok, status: r.status, json }
+}
+
+function proxyErrorMessage(json: unknown, status: number, what: string): string {
+  return (json as { error?: string; message?: string } | null)?.error
+    ?? (json as { message?: string } | null)?.message
+    ?? `${what} failed (HTTP ${status})`
+}
+
+async function tryProxyOrder(
+  params: URLSearchParams,
+  timeoutMs: number,
+): Promise<{ ok: true; data: OrderResponse } | { ok: false; retryable: boolean; message: string }> {
+  try {
+    const r = await fetchJson(`/api/jup?op=order&${params.toString()}`, {
+      headers: { Accept: 'application/json' },
+      signal: AbortSignal.timeout(timeoutMs),
+    })
+    if (r.ok) return { ok: true, data: r.json as OrderResponse }
+    const message = proxyErrorMessage(r.json, r.status, 'Quote request')
+    return { ok: false, retryable: shouldFallbackStatus(r.status), message }
+  } catch (e) {
+    const message = String((e as Error)?.message ?? e)
+    return { ok: false, retryable: isTransientFetchError(message), message }
+  }
 }
 
 function proxyAvailable(): boolean {
@@ -258,71 +303,72 @@ export async function fetchOrder(args: {
   })
   if (args.slippageBps != null) params.set('slippageBps', String(args.slippageBps))
 
-  // 1) Same-origin proxy (server injects x-api-key — key never touches the bundle)
+  // 1) Same-origin proxy (server injects x-api-key — key never touches the bundle).
+  //     Only definitive Jupiter 4xx errors stop here; timeouts / 429 / 5xx
+  //     fall through to the direct path below (different network route).
   if (proxyAvailable()) {
-    try {
-      const r = await fetchJson(`/api/jup?op=order&${params.toString()}`, {
-        headers: { Accept: 'application/json' },
-        signal: AbortSignal.timeout(20_000),
-      })
-      if (r.ok) return r.json as OrderResponse
-      // 404 = no function on this host → fall through to direct.
-      // 4xx/5xx from Jupiter via proxy are real errors — surface them.
-      if (r.status !== 404) {
-        const msg = (r.json as { error?: string; message?: string } | null)?.error
-          ?? (r.json as { message?: string } | null)?.message
-          ?? `Quote request failed (HTTP ${r.status})`
-        throw new Error(msg)
-      }
-    } catch (e) {
-      const m = String((e as Error).message ?? e)
-      // Only fall through on proxy-missing / network-to-proxy failures.
-      if (!/404|Failed to fetch|Load failed|NetworkError|network/i.test(m)) throw e
-    }
+    const pr = await tryProxyOrder(params, 20_000)
+    if (pr.ok) return pr.data
+    if (!pr.retryable) throw new Error(pr.message)
   }
 
-  // 2) Direct fallback (local dev without vercel dev — uses VITE_ key if set)
-  const r = await fetch(`${JUP_SWAP_BASE}/order?${params.toString()}`, {
-    headers: { Accept: 'application/json', ...jupHeaders() },
-    signal: AbortSignal.timeout(20_000),
-  })
-  const j = await r.json().catch(() => null)
-  if (!r.ok) {
-    const msg = (j as { error?: string } | null)?.error ?? `Jupiter quote HTTP ${r.status}`
-    throw new Error(msg)
+  // 2) Direct fallback (local dev without the proxy, or proxy having a bad
+  //    minute) with one automatic retry on transient failures.
+  let lastErr = 'Quote request failed.'
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const r = await fetch(`${JUP_SWAP_BASE}/order?${params.toString()}`, {
+        headers: { Accept: 'application/json', ...jupHeaders() },
+        signal: AbortSignal.timeout(20_000),
+      })
+      const j = await r.json().catch(() => null)
+      if (!r.ok) {
+        const msg = (j as { error?: string } | null)?.error ?? `Jupiter quote HTTP ${r.status}`
+        if (!shouldFallbackStatus(r.status)) throw new Error(msg)
+        lastErr = msg
+      } else {
+        return j as OrderResponse
+      }
+    } catch (e) {
+      const m = String((e as Error)?.message ?? e)
+      if (!isTransientFetchError(m)) throw e
+      lastErr = m
+    }
+    if (attempt === 0) await new Promise((res) => setTimeout(res, 1200))
   }
-  return j as OrderResponse
+  throw new Error(lastErr)
 }
 
 export async function executeOrder(args: {
   signedTransaction: string
   requestId: string
 }): Promise<ExecuteResponse> {
+  const body = JSON.stringify({ signedTransaction: args.signedTransaction, requestId: args.requestId })
+  // 1) Same-origin proxy first. A killed/timed-out function (e.g. 504) is
+  //    retryable — the signed tx is idempotent (re-broadcast returns the
+  //    same signature), so falling through to direct is safe.
   if (proxyAvailable()) {
     try {
       const r = await fetchJson('/api/jup?op=execute', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({ signedTransaction: args.signedTransaction, requestId: args.requestId }),
+        body,
         signal: AbortSignal.timeout(60_000),
       })
       if (r.ok) return r.json as ExecuteResponse
-      if (r.status !== 404) {
-        const msg = (r.json as { error?: string; message?: string } | null)?.error
-          ?? (r.json as { message?: string } | null)?.message
-          ?? `Execute failed (HTTP ${r.status})`
-        throw new Error(msg)
-      }
+      if (!shouldFallbackStatus(r.status)) throw new Error(proxyErrorMessage(r.json, r.status, 'Execute'))
     } catch (e) {
-      const m = String((e as Error).message ?? e)
-      if (!/404|Failed to fetch|Load failed|NetworkError|network/i.test(m)) throw e
+      const m = String((e as Error)?.message ?? e)
+      if (!isTransientFetchError(m)) throw e
     }
   }
+  // 2) Direct to Jupiter (no function timeout in the way — /execute polls
+  //    for landing server-side, so give it room).
   const r = await fetch(`${JUP_SWAP_BASE}/execute`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Accept: 'application/json', ...jupHeaders() },
-    body: JSON.stringify({ signedTransaction: args.signedTransaction, requestId: args.requestId }),
-    signal: AbortSignal.timeout(60_000),
+    body,
+    signal: AbortSignal.timeout(90_000),
   })
   const j = await r.json().catch(() => null)
   if (!r.ok) {
@@ -371,12 +417,12 @@ export async function searchTokens(query: string): Promise<DexToken[]> {
       if (r.ok && Array.isArray(r.json)) {
         return (r.json as TokenSearchItem[]).map(toDexToken).filter((t): t is DexToken => t != null).slice(0, 20)
       }
-      if (!r.ok && r.status !== 404) {
+      if (!r.ok && !shouldFallbackStatus(r.status)) {
         throw new Error(`Token search HTTP ${r.status}`)
       }
     } catch (e) {
       const m = String((e as Error).message ?? e)
-      if (!/404|Failed to fetch|Load failed|NetworkError|network/i.test(m)) throw e
+      if (!isTransientFetchError(m)) throw e
     }
   }
   const r = await fetch(`${JUP_TOKENS_BASE}/search?${params.toString()}`, {
