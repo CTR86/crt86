@@ -4,7 +4,7 @@ import { Panel } from '../design/ui'
 const STEPS: { n: string; title: string; body: string }[] = [
   {
     n: '01',
-    title: 'DEX.EXE — SOLANA',
+    title: 'JUP.EXE — SOLANA',
     body: 'Spot DEX inside the CRT. Swap, chart and snipe Solana pairs first — same terminal, no new site.',
   },
   {

@@ -5,6 +5,11 @@ import { defineConfig, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import bpHandler from './api/bp.mjs'
 import jupHandler from './api/jup.mjs'
+import lendHandler from './api/lend.mjs'
+import uniswapHandler from './api/uniswap.mjs'
+import pancakeHandler from './api/pancake.mjs'
+import polyHandler from './api/poly.mjs'
+import kalshiHandler from './api/kalshi.mjs'
 
 function loadServerEnv() {
   const p = path.resolve('.env.local')
@@ -33,6 +38,21 @@ function backpackApiPlugin(): Plugin {
       })
       server.middlewares.use('/api/jup', (req: IncomingMessage, res: ServerResponse, next) => {
         void Promise.resolve(jupHandler(req, res)).catch(next)
+      })
+      server.middlewares.use('/api/lend', (req: IncomingMessage, res: ServerResponse, next) => {
+        void Promise.resolve(lendHandler(req, res)).catch(next)
+      })
+      server.middlewares.use('/api/uniswap', (req: IncomingMessage, res: ServerResponse, next) => {
+        void Promise.resolve(uniswapHandler(req, res)).catch(next)
+      })
+      server.middlewares.use('/api/pancake', (req: IncomingMessage, res: ServerResponse, next) => {
+        void Promise.resolve(pancakeHandler(req, res)).catch(next)
+      })
+      server.middlewares.use('/api/poly', (req: IncomingMessage, res: ServerResponse, next) => {
+        void Promise.resolve(polyHandler(req, res)).catch(next)
+      })
+      server.middlewares.use('/api/kalshi', (req: IncomingMessage, res: ServerResponse, next) => {
+        void Promise.resolve(kalshiHandler(req, res)).catch(next)
       })
     },
   }

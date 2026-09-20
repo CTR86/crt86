@@ -165,6 +165,7 @@ export function SolanaWalletProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const signAnyBase64 = useCallback(async (b64: string, _versioned: boolean) => {
+    void _versioned // wire format is autodetected below; the flag is legacy
     const d = detect()
     if (!d) throw new Error('No Solana wallet connected')
     const web3 = await import('@solana/web3.js')
@@ -179,7 +180,7 @@ export function SolanaWalletProvider({ children }: { children: ReactNode }) {
     const signed = (await d.provider.signTransaction(tx)) ?? tx
     const bytes = signed.serialize() as Uint8Array
     const signedB64 = btoa(String.fromCharCode(...new Uint8Array(bytes)))
-    let sigBytes: Uint8Array | null = null
+    let sigBytes: Uint8Array | null
     if (signed instanceof web3.VersionedTransaction) sigBytes = signed.signatures[0] ?? null
     else sigBytes = signed.signatures[0]?.signature ?? null
     const signature: TransactionSignature = sigBytes ? (await import('bs58')).default.encode(sigBytes) : ''

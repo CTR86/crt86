@@ -163,7 +163,8 @@ function decodePosition(data: Uint8Array, address: string): PerpPosition | null 
     // Heuristic: custodyHex helps infer market asset (we map by byte prefix length; not perfect but best without custody fetch)
     // For v1 we attach market by matching side + custody hint if we can; otherwise infer via price range
     // Real fidelity needs custody account fetch; for now we do asset inference by size/price sanity and mark as UNKNOWN to avoid faking
-    let marketId: string | null = null
+    // Custody-mapped market stays unknown without a custody fetch — UI shows UNKNOWN, never faked.
+    const marketId: string | null = null
     // We can't reliably map custody pubkey without the custody account — so we derive marketId from custodyHex
     // by trying to match known custody pubkeys lazily via address string (which we don't have yet without bs58).
     // Instead: for display we keep custodyHex and do market lookup via getCustodyMap later; here just probe price tier.
@@ -248,6 +249,7 @@ export async function fetchPositionsForOwner(ownerBase58: string): Promise<{ pos
 }
 
 async function enrichPositionsMarket(positions: PerpPosition[], _conn: import('@solana/web3.js').Connection): Promise<PerpPosition[]> {
+  void _conn
   // For v1 we do a tiny heuristic: map via custody pubkey if we can fetch custody accounts.
   // Custody program fetch is optional — if it fails, positions still render as UNKNOWN (honest).
   if (positions.length === 0) return positions
@@ -283,5 +285,6 @@ void PERP_MARKETS
 // We keep history empty until Jupiter exposes a wallet-indexed order API.
 // The UI shows an honest empty state instead of synthetic trades.
 export async function fetchHistoryForOwner(_owner: string): Promise<{ items: import('./types').PerpOrderHistoryItem[]; note: string }> {
+  void _owner
   return { items: [], note: 'On-chain history indexing is not yet exposed by Jupiter Perps — your wallet explorer is the source of truth for fills.' }
 }

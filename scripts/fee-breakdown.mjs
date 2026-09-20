@@ -29,6 +29,7 @@ async function prepare(label, extra) {
   else {
     const d = j.data
     // drop the giant base64 tx for readability
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { paymentTransaction, signedQuote, ...rest } = d
     console.log(JSON.stringify(rest, null, 1))
     console.log('lamports in SOL:', d.payment?.lamports != null ? Number(d.payment.lamports) / 1e9 : 'n/a')

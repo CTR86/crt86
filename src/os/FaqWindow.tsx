@@ -5,7 +5,7 @@ import { Panel } from '../design/ui'
 const QA: { q: string; a: string }[] = [
   {
     q: 'WHAT IS CRT86?',
-    a: 'A retro 80s computer-styled launchpad OS for Solana. One CRT terminal, multiple launch engines (StonkFun, Ember) and more modules landing on the desktop as they are built: DEX, BRIDGE, TRADING TERMINAL.',
+    a: 'A retro 80s computer-styled trading OS on Solana + EVM. One CRT terminal: coin launcher (StonkFun, Ember), swaps (Jupiter, Uniswap, PancakeSwap), perps (Hyperliquid, Aster), bridge, stocks, market wire, games.',
   },
   {
     q: 'HOW DO I LAUNCH A COIN?',
@@ -13,7 +13,7 @@ const QA: { q: string; a: string }[] = [
   },
   {
     q: 'WHICH WALLETS WORK?',
-    a: 'Any Solana wallet: Phantom (recommended), Solflare, Backpack. The wallet bay in the header lights up when detected. EVM wallets (MetaMask etc.) will be needed when the RH-CHAIN trading module ships.',
+    a: 'Any Solana wallet: Phantom (recommended), Solflare, Backpack. The wallet bay in the header lights up when detected. EVM wallets (MetaMask etc.) for swaps, bridge and Hyperliquid perps. The RH-CHAIN trading module is flag-gated for now.',
   },
   {
     q: 'WHAT DOES IT COST?',

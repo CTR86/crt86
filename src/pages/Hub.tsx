@@ -45,7 +45,7 @@ function NewCoinCard({ token }: { token: import('../lib/stonkfun').SfToken }) {
 
 export function Hub() {
   const { data: stats } = useStats()
-  const { data: newest } = useTokens({ sort: 'newest', pageSize: 9 })
+  const { data: newest, isFetching: newestSyncing, refetch: refetchNewest } = useTokens({ sort: 'newest', pageSize: 9 })
   const memePage = useMemePage(1, 6, RH_ENABLED)
 
   return (
@@ -79,7 +79,7 @@ export function Hub() {
           </div>
         </Panel>
 
-        <Panel title="NEW TRANSMISSIONS · SOL" end={<Link to="/terminal" className="t8" style={{ color: 'var(--pink)' }}>VIEW ALL →</Link>}>
+        <Panel title="NEW TRANSMISSIONS · SOL ● LIVE" end={<span style={{ display: 'inline-flex', gap: 8, alignItems: 'center' }}><span className="t8" style={{ color: newestSyncing ? 'var(--amber)' : 'var(--green)' }}>{newestSyncing ? 'SYNCING…' : '● LIVE · 5s'}</span><button className="bevel-btn b-sm" onClick={() => void refetchNewest()} disabled={newestSyncing}>↻</button><Link to="/terminal" className="t8" style={{ color: 'var(--pink)' }}>VIEW ALL →</Link></span>}>
           <div className="cards-grid">
             {(newest?.tokens ?? []).slice(0, 9).map((t) => (
               <NewCoinCard key={t.mint} token={t} />

@@ -24,15 +24,18 @@ This repo is the **public, decentralized release** of the CRT86 frontend. Commun
 
 ```
 CRT-DOS 6.86
-├── LAUNCHPAD.EXE  · Multi-engine launcher (StonkFun + Ember + Meteora DBC)
-├── MONEY.EXE      · Official coin — CA verified on Solscan
-├── STOCK.EXE      · Backpack tokenized US stocks — public tape; RFQ waits for key
-├── PERP.EXE       · Jupiter Perps (SOL/ETH/WBTC long/short, parked as SOON)
-├── GACHA.EXE      · On-chain gacha pulls (parked as SOON)
-├── DEX.EXE        · Spot swap/chart/snipe (parked as SOON)
-├── BRIDGE.EXE     · Relay — SOL ↔ 7 EVMs (live, tracked)
-├── TERMINAL.EXE   · Market wire
+├── LAUNCHPAD.EXE  · Multi-engine launcher (StonkFun + Ember + Meteora DBC devnet)
+├── MONEY.EXE      · Official coin — CA + Solscan links
+├── STOCK.EXE      · Backpack tokenized US stocks — public tape; RFQ needs server key
+├── PERP.EXE       · Hyperliquid + Aster perps — long/short, leverage, TP/SL (mainnet)
+├── JUP.EXE        · Jupiter Solana swaps (order → sign → execute)
+├── UNISWAP.EXE    · Uniswap Trading API (CLASSIC) + on-chain V3 fallback · 6 EVM chains
+├── PANCAKE.EXE    · PancakeSwap V2 on-chain swaps
+├── LEND.EXE       · Jupiter Lend — earn supply/withdraw + borrow operate
+├── BRIDGE.EXE     · Relay — SOL ↔ EVMs, tracked fills
+├── TERMINAL.EXE   · Market wire (StonkFun feed)
 ├── SNAKE.EXE      · Wire worm — highscore in localStorage
+├── SHOOT.EXE      · Star ranger — waves, hull, highscore in localStorage
 ├── X.EXE          · @crt86vibe
 ├── GITHUB.EXE     · source — github.com/CTR86/crt86
 └── FEE VAULT / PORTFOLIO / HUB / ROADMAP / FAQ
@@ -46,14 +49,15 @@ CRT-DOS 6.86
 
 | Module | Status | Stack |
 |---|---|---|
-| **Launchpad** | Live | StonkFun `api/public/v1` + Ember (`embercurve.fun`) + Meteora DBC `dbcij3LW...` · `ZERO PLATFORM FEE` · wallet `signTx` → platform broadcast |
-| **Money.exe** | Live | Official CA `Dbjy6uN3DNxn1NdnM1sKrMXb5XXkuWrM5yuL1PqDpump` · Pump/Solscan links |
-| **Stock.exe** | Live (tape) | Backpack `api.backpack.exchange` via `/backpack` rewrite · securities + sessions + tickers · RFQ trade waits for server-side ED25519 key |
-| **Bridge.exe** | Live | Relay `api.relay.link` · `SOLANA 792703809 ↔ EVM` · quote → confirm → `signTx` → `sendRawTransaction` → `waitForRelayFill` |
+| **Launchpad** | Live (StonkFun + Ember delegated; Meteora DBC devnet, unconfigured) | StonkFun `api/public/v1` + Ember (`embercurve.fun`) + Meteora DBC SDK · `ZERO PLATFORM FEE` |
+| **Money.exe** | Live (display + links) | Official CA · Pump/Solscan links |
+| **Stock.exe** | Live tape, RFQ needs key | Backpack `api.backpack.exchange` via `/backpack` + `/api/bp` ED25519 server signer |
+| **Perp.exe** | Live (mainnet default, testnet toggle) | Hyperliquid (wallet/agent EIP-712) + Aster (agent key, browser-only) · market/limit/TP/SL/close · WS live marks |
+| **Jup/Uniswap/Pancake.exe** | Live | Jupiter `/api/jup` proxy · Uniswap Trading API via `/api/uniswap` + V3 fallback · Pancake V2 on-chain |
+| **Lend.exe** | Live (reads + wallet tx) | Jupiter Lend `api.jup.ag/lend/v1` via `/api/lend` proxy |
+| **Bridge.exe** | Live | Relay `api.relay.link` · quote → confirm → sign → `waitForRelayFill` |
 | **Terminal / Hub / Portfolio / Fee Vault** | Live | `@tanstack/react-query` polling, block-chart `Scope` canvas |
-| **Perp.exe** | `SOON` (parked) | Jupiter Perps `PERPHjGBq...` · pool `5BUwFW4...` · custody `7xS2gz...` · `price.jup.ag → coingecko → binance` fallback |
-| **Gacha.exe / Dex.exe** | `SOON` | Slots reserved, `ComingSoon` OS chrome (99% loader) |
-| **Snake.exe** | Live | Canvas, swipe + WASD + d-pad, `crt86-snake-high` persistence |
+| **Snake.exe / Shoot.exe** | Live | Canvas, keyboard + touch, `crt86-snake-high` / `crt86-shoot-high` persistence |
 
 Desktop is fully responsive — grid snaps `4 → 3 → 2` columns, mobile `TAP TO OPEN`, OS taskbar with `PHANTOM` / `CA` / `SOON` badges.
 
@@ -62,10 +66,10 @@ Desktop is fully responsive — grid snaps `4 → 3 → 2` columns, mobile `TAP 
 ## Tech Stack
 
 - **Runtime:** Vite 7 + React 19 + TypeScript 5.9 (strict) + React Router 7 (HashRouter) + Zustand
-- **Chain:** `@solana/web3.js` 1.98 + `viem` 2.38 + `@tanstack/react-query` 5.90 + `bs58` + `bn.js`
+- **Chain:** `@solana/web3.js` 1.98 + `viem` 2.38 + `@tanstack/react-query` 5.90 + `bs58` + `bn.js` + `@msgpack/msgpack` (Hyperliquid action hashing)
 - **Curve:** `@meteora-ag/dynamic-bonding-curve-sdk` 1.5 + `@fontsource/*`
-- **Infra:** Vercel (`vercel.json` rewrites `/ember/*`, `/jup-perps/*`, `/jup-price/*`), Helius RPC primary, public fallbacks
-- **Testing:** Vitest 5 — `src/lib/launch/validation.test.ts`, `src/lib/perp/math.test.ts`
+- **Infra:** Vercel (serverless `/api/bp|jup|lend|uniswap|pancake` + rewrites `/ember/*`, `/backpack/*`), Helius RPC primary, public fallbacks
+- **Testing:** Vitest 5 — launch validation, dex/swap/uniswap/futures/lend parsing + math (7 files, 98 tests)
 
 ---
 
@@ -99,7 +103,19 @@ npm test           # vitest run
 
 ## Environment
 
-Copy `.env.example` → `.env.local`. All secrets are `VITE_*` — visible to the browser. For a truly private key, proxy via Vercel rewrites (`/api/*`) instead of `VITE_`.
+Copy `.env.example` → `.env.local`. High-value secrets are server-only (`/api/*`
+proxies inject them); `VITE_*` is public by design — `VITE_JUPITER_API_KEY` and
+`VITE_RELAY_API_KEY` exist only as local-dev/rate-limit fallbacks.
+
+Key variables: `VITE_SOLANA_RPC_URL`, `VITE_SOLANA_CLUSTER`,
+`VITE_METEORA_DBC_CONFIG_*` (DIRECT engine, empty = honestly disabled),
+`VITE_PLATFORM_FEE_BPS=0`, `JUPITER_API_KEY` (server, JUP+LEND),
+`UNISWAP_API_KEY` (server, API-first routing), `BACKPACK_API_KEY|_SECRET|_NAME`
+(server ED25519 RFQ signer), `VITE_RELAY_API_KEY` (optional limits),
+`VITE_{BSC,ETH,BASE,ARBITRUM,POLYGON,AVALANCHE}_RPC_URL` (optional overrides).
+Full list with docs in `.env.example`.
+
+No `.env.local` is committed. The public repo ships only `.env.example`.
 
 ```ini
 VITE_SOLANA_RPC_URL=https://api.mainnet-beta.solana.com
@@ -132,30 +148,38 @@ No `.env.local` is committed. The public repo ships only `.env.example`.
 
 ```
 public/              # favicon.svg, brand assets
+api/                 # serverless: bp (Backpack signer), jup, lend, uniswap, pancake
 src/
-  App.tsx            # HashRouter + NeonOs + LaunchpadModule + routes (/perp /gacha → ComingSoon)
-  config.ts          # RH_ENABLED + OFFICIAL_CA
+  App.tsx            # HashRouter + NeonOs + LaunchpadModule + routes
+  config.ts          # RH_ENABLED (false) + OFFICIAL_CA
   design/            # CrtShell, Panel/Readout/Field/SystemDialog, MobileNotice
   components/        # Header, StatusBar, TickerTape
-  hooks/             # stonk / prm / perp / useSolPrice / launchDirect
+  hooks/             # stonk / stock / prm / perp (parked) / useSolPrice / launchDirect
   lib/
     stonkfun.ts      # SF_BASE public API, no key, CORS *
     ember.ts         # /ember proxy
     relay.ts         # Relay v2 quote/index/status, decimal fix for SOL 9 vs EVM 18
     format.ts        # fmtUsd/Price/Addr/blocks
     launch/          # config + validation + Meteora DBC engine + tx builders
-    perp/            # config + types + math (liq/pnl) + api (price/JLP/positions) + tx builders
+    dex/             # Jupiter swap client (JUP.EXE)
+    swap/            # shared EVM plumbing + Uniswap (API-first) + PancakeSwap V2
+    futures/         # Hyperliquid + Aster clients, Solana-free EIP-712 signing
+    backpack/        # Backpack tape + RFQ trade client (server signs)
+    lend/            # Jupiter Lend earn/borrow client
+    perp/            # PARKED Jupiter-perps engine (no live route)
     prm/             # Robinhood Chain 4663 chain/abis/discovery/quotes/swaps (flag-gated)
-  os/                # Desktop, ModuleLoader, OsBoot, ComingSoon, Money/Snake/Bridge/Perp/Faq/Roadmap/Terminal/X/Settings
-  pages/             # Hub, LaunchDeck, TradeTerminal, FeeVault, Portfolio
+  os/                # Desktop, ModuleLoader, OsBoot, Money/Snake/Shoot/Bridge/Stock/Lend/
+                     # Jup/Uniswap/Pancake shared EvmSwapWindow, PerpTradeWindow,
+                     # JupPerpWindow (parked), Faq/Roadmap/Terminal/X/GitHub/Settings
+  pages/             # Hub, LaunchDeck, TradeTerminal (gated), FeeVault, Portfolio, Markets
   wallets/           # SolanaWallet (Phantom/Solflare/Backpack) + EvmWallet (EIP-1193)
   store/             # ui / settings / terminal
   styles/            # theme.css / components.css / crt.css / base.css
   sound/             # WebAudio sfx (click/boot/coin/alert/launch/win/error/open)
-brand/               # (not published — marketing sources)
-.zcode/              # (not published — private plans)
-vercel.json          # rewrites: /ember, /jup-perps, /jup-price
-vite.config.ts       # dev proxy for Ember (CORS)
+brand/               # (not published — marketing sources, gitignored)
+.zcode/              # (not published — private plans, gitignored)
+vercel.json          # rewrites: /ember, /backpack (+ parked /jup-perps, /jup-price)
+vite.config.ts       # dev: /api/* middleware + /ember + /backpack proxies
 ```
 
 ---
@@ -165,7 +189,7 @@ vite.config.ts       # dev proxy for Ember (CORS)
 - **Wallet:** Single Solana wallet (`SolanaWalletProvider`) injected via `window.phantom/solflare/backpack`. `signTx` + `signAndSendTransaction` both supported; Launch flows `sign` then multi-RPC `sendRawTransaction`; Bridge falls back to `signAndSend` when Phantom blocks pure sign.
 - **Data:** `useQuery` with `retry:1`, `staleTime`/`refetchInterval` tuned per feed (tokens 10s, JLP 30s, prices 20s). No websocket dependency (RH-Chain has none).
 - **Trading flow (honest):** `validate → quote/preview → SystemDialog confirm → wallet sign (once) → send → confirm → refresh`. Simulation (`simulateTransaction`) before sign; never auto-sign; never fake `txHash` or mock positions.
-- **Perps:** Keeper model — user tx creates `PositionRequest`, keeper fulfills at oracle price. Without `VITE_JUP_CUSTODY_*`, `PERP.EXE` shows read-only warning (no fake fills). Liq price is an estimate (`entry * (1 ± 0.9/lev)`) labelled as such.
+- **Perps:** Hyperliquid (wallet or 1-click on-chain agent, EIP-712) and Aster (browser-only agent key). Leverage set on order, reduce-only close + TP/SL triggers, WS live marks with REST fallback. Testnet toggle, mainnet default — real PnL only on mainnet. (Legacy Jupiter-perps engine parked, no route.)
 - **Bridge decimal bug fixed:** `currencyOutHuman` reads `currencyOut.currency.decimals` (Relay v2) with `SOL→9` fallback — fixes `0.00000 SOL` quotes.
 
 ---

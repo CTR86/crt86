@@ -325,7 +325,7 @@ export function DexWindow() {
         signed = (await sol.signTx(tx)) as import('@solana/web3.js').VersionedTransaction
       } catch (e) {
         const m = String((e as Error).message ?? e)
-        if (isWalletRejection(m)) throw new Error('You rejected the request in your wallet.')
+        if (isWalletRejection(m)) throw new Error('You rejected the request in your wallet.', { cause: e })
         throw e
       }
       const signedB64 = bytesToB64(signed.serialize() as Uint8Array)
@@ -443,7 +443,7 @@ export function DexWindow() {
   return (
     <div className="page" style={{ alignItems: 'center', justifyContent: 'center', flex: 1, minHeight: '70vh' }}>
       <div style={{ maxWidth: 720, width: '100%' }}>
-        <Panel title="DEX.EXE — SOLANA SWAP" end={<span className="pt-end">JUPITER</span>}>
+        <Panel title="JUP.EXE — SOLANA SWAP" end={<span className="pt-end">JUPITER</span>}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10, position: 'relative' }}>
             {/* SELL */}
             <div style={{ border: '2px solid var(--line)', padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>

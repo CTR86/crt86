@@ -1,0 +1,24 @@
+# Codified upload excludes for `vercel deploy` (mirrors DEPLOY.md Step 1).
+# Secrets and build artifacts must never reach Vercel's file upload,
+# with or without git metadata attached.
+
+.env.local
+.env.*.local
+node_modules/
+dist/
+.vercel/
+tmp-verify/
+.zcode/
+brand/
+relay-chains.tmp.json
+*.tmp.json
+*.log
+coverage/
+.nyc_output/
+# Tests never belong in serverless deployments (vitest runs them locally).
+# (Also silences Vercel's function type-validator on untyped .mjs imports.)
+*.test.ts
+*.test.mjs
+*.test.tsx
+__tests__/
+vitest.config.*

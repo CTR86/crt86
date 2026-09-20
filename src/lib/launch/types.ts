@@ -2,8 +2,6 @@
    LaunchEngine abstraction — keeps the product extensible.
 
    Production today: MeteoraLaunchEngine (direct DBC SDK, devnet testing).
-   Secondary / optional: RaydiumLaunchEngine (LaunchLab, stubbed —
-   interface-compatible, throws until enabled).
 
    Existing third-party engines (StonkFun API, Ember API) stay untouched
    in src/lib/stonkfun.ts + src/lib/ember.ts.
@@ -11,7 +9,7 @@
 
 import type { Connection, PublicKey, Transaction } from '@solana/web3.js'
 
-export type EngineId = 'meteora-dbc' | 'raydium-launchlab'
+export type EngineId = 'meteora-dbc'
 
 /** UI transaction lifecycle — every blockchain op surfaces these states
  *  through the EXISTING Panel/Readout/telemetry components. */

@@ -111,9 +111,6 @@ export function mapTxError(e: unknown): { message: string; retryable: boolean } 
   if (lower.includes('invalid') || lower.includes('not configured')) {
     return { message: msg.slice(0, 320), retryable: false }
   }
-  if (lower.includes('raydium') && lower.includes('not enabled')) {
-    return { message: msg.slice(0, 320), retryable: false }
-  }
   return { message: msg.slice(0, 320), retryable: true }
 }
 

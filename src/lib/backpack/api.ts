@@ -1,7 +1,7 @@
 /* Backpack Exchange — public market data for STOCK.EXE.
    REST is proxied same-origin (`/backpack` → api.backpack.exchange)
-   so the browser does not need CORS. Trading (RFQ / orders) is signed
-   ED25519 and stays off this client until a server-side key is wired. */
+   so the browser does not need CORS. Trading (RFQ submit/accept/cancel)
+   is ED25519-signed server-side via /api/bp (see src/lib/backpack/trade.ts). */
 
 export const BACKPACK_PROXY = '/backpack'
 

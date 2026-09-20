@@ -109,7 +109,7 @@ export async function buildOpenPositionTx(args: BuildOpenArgs): Promise<BuiltTx>
   data[o] = sideByte; o += 1
   data.set(encodeU64LE(priceSlippage), o); o += 8
   data.set(encodeU64LE(0n), o); o += 8 // jupiterMinimumOut
-  data.set(encodeU64LE(collDelta), o); o += 8 // preSwapAmount = collateral (long deposits directly)
+  data.set(encodeU64LE(collDelta), o) // preSwapAmount = collateral (long deposits directly)
 
   // Derive PDAs (Position + PositionRequest) — seeds per IDL/position-account doc:
   // Position: ["position", owner, custody, collateralCustody]
@@ -214,7 +214,7 @@ export async function buildClosePositionTx(args: { market: PerpMarket; ownerBase
   data[o] = args.market.side === 'long' ? 1 : 2; o += 1
   data.set(encodeU64LE(BigInt(1_000_000)), o); o += 8 // priceSlippage
   data.set(encodeU64LE(0n), o); o += 8
-  data.set(encodeU64LE(0n), o); o += 8
+  data.set(encodeU64LE(0n), o)
 
   const [positionPda] = PublicKey.findProgramAddressSync([Buffer.from('position'), owner.toBytes(), custody.toBytes(), collateralCustody.toBytes()], programId)
   const [positionRequestPda] = PublicKey.findProgramAddressSync([Buffer.from('position_request'), owner.toBytes(), custody.toBytes(), collateralCustody.toBytes(), Buffer.from([0])], programId)

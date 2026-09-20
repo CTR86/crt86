@@ -138,6 +138,9 @@ export function SnakeWindow() {
   const stepRef = useRef(step)
   stepRef.current = step
 
+  const phaseRef = useRef(phase)
+  phaseRef.current = phase
+
   const start = () => {
     const cy = Math.floor(ROWS / 2)
     snakeRef.current = [
@@ -208,12 +211,8 @@ export function SnakeWindow() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const phaseRef = useRef(phase)
-  phaseRef.current = phase
-
   useEffect(() => {
     draw()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const onTouchStart = (e: React.TouchEvent) => {

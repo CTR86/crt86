@@ -6,6 +6,18 @@ const NAME = () => (process.env.BACKPACK_API_NAME || 'crt2').trim()
 
 const ED25519_PKCS8_PREFIX = Buffer.from('302e020100300506032b657004220420', 'hex')
 
+// Optional operator gate. When BP_OPERATOR_TOKEN is set, every op except
+// `status` requires the matching `x-operator-token` header — otherwise any
+// site visitor could trade the operator's Backpack account. Unset = open
+// (legacy behavior for single-operator use).
+function operatorToken() {
+  return (process.env.BP_OPERATOR_TOKEN || '').trim()
+}
+
+function gated() {
+  return operatorToken().length > 0
+}
+
 function creds() {
   const apiKey = (process.env.BACKPACK_API_KEY || '').trim()
   const secret = (process.env.BACKPACK_API_SECRET || '').trim()
@@ -113,7 +125,12 @@ export default async function handler(req, res) {
     }
 
     if (method === 'GET' && (op === 'status' || op === '')) {
-      send(res, 200, { configured: configured(), name: NAME() })
+      send(res, 200, { configured: configured(), name: NAME(), gated: gated() })
+      return
+    }
+
+    if (gated() && req.headers['x-operator-token'] !== operatorToken()) {
+      send(res, 403, { message: 'OPERATOR TOKEN REQUIRED' })
       return
     }
 

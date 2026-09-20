@@ -185,8 +185,8 @@ export function Markets() {
   const [tab, setTab] = useState<'sol' | 'rh'>('sol')
   const [rhTab, setRhTab] = useState<'memes' | 'stocks'>('memes')
 
-  // SOL grid state
-  const [sort, setSort] = useState<'newest' | 'marketCap' | 'volume'>('marketCap')
+  // SOL grid state — default to newest so fresh launches surface first
+  const [sort, setSort] = useState<'newest' | 'marketCap' | 'volume'>('newest')
   const [status, setStatus] = useState<'' | 'new' | 'aboutToGraduate' | 'graduated'>('')
   const [mode, setMode] = useState<'' | 'standard' | 'reward'>('')
   const [q, setQ] = useState('')
@@ -234,14 +234,24 @@ export function Markets() {
 
       {tab === 'sol' ? (
         <Panel
-          title="SOL GRID · STONKFUN WIRE"
-          end={`${sol.data ? `PAGE ${sol.data.pagination.page}/${sol.data.pagination.totalPages}` : '···'}`}
+          title="SOL GRID · STONKFUN WIRE ● LIVE"
+          end={
+            <span style={{ display: 'inline-flex', gap: 8, alignItems: 'center' }}>
+              <span>{sol.data ? `PAGE ${sol.data.pagination.page}/${sol.data.pagination.totalPages}` : '···'}</span>
+              <span className="t8" style={{ color: sol.isFetching ? 'var(--amber)' : 'var(--green)' }}>
+                {sol.isFetching ? 'SYNCING…' : '● LIVE'}
+              </span>
+              <button className="bevel-btn b-sm" onClick={() => void sol.refetch()} disabled={sol.isFetching}>
+                ↻ REFRESH
+              </button>
+            </span>
+          }
         >
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center', marginBottom: 12 }}>
             <input placeholder="SEARCH COINS…" value={q} onChange={(e) => setQ(e.target.value)} style={{ minWidth: 180 }} />
             <select value={sort} onChange={(e) => setSort(e.target.value as typeof sort)}>
-              <option value="marketCap">SORT: MCAP</option>
               <option value="newest">SORT: NEWEST</option>
+              <option value="marketCap">SORT: MCAP</option>
               <option value="volume">SORT: VOLUME</option>
             </select>
             <select value={status} onChange={(e) => setStatus(e.target.value as typeof status)}>

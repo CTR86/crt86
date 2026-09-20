@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Panel } from '../design/ui'
 import { useBpBalances, useBpRfqs, useBpStatus, useStockHolidays, useStockMarkets, useStockTickers, useStockUniverse } from '../hooks/stock'
 import { num, rfqSymbol, tickerForAsset, type Security } from '../lib/backpack/api'
-import { acceptBpQuote, bestQuote, cancelBpRfq, rfqIdOf, submitBpRfq } from '../lib/backpack/trade'
+import { acceptBpQuote, bestQuote, cancelBpRfq, clearBpOperatorToken, loadBpOperatorToken, rfqIdOf, saveBpOperatorToken, submitBpRfq } from '../lib/backpack/trade'
 import { currentSession, sessionForSecurity, sessionLabel, type SessionId } from '../lib/backpack/session'
 import { cn, fmtPrice } from '../lib/format'
 import { play } from '../sound/sfx'
@@ -37,8 +37,12 @@ export function StockWindow() {
   const [note, setNote] = useState<string | null>(null)
   const statusQ = useBpStatus()
   const keyed = !!statusQ.data?.configured
-  const balQ = useBpBalances(keyed)
-  const rfqQ = useBpRfqs(keyed)
+  const gated = !!statusQ.data?.gated
+  const [opTok, setOpTok] = useState(() => loadBpOperatorToken() ?? '')
+  const [opSaved, setOpSaved] = useState(() => !!loadBpOperatorToken())
+  const opOk = !gated || opSaved
+  const balQ = useBpBalances(keyed && opOk)
+  const rfqQ = useBpRfqs(keyed && opOk)
 
   useEffect(() => {
     const iv = setInterval(() => setNow(Date.now()), 15_000)
@@ -238,6 +242,46 @@ export function StockWindow() {
                     <span className="sk">{tapeTicker(selected.asset)}</span>
                     <span className="sv">{balQ.data?.[selected.asset]?.available ?? '0'}</span>
                   </div>
+                  {gated ? (
+                    <div style={{ display: 'flex', gap: 6, marginTop: 4 }}>
+                      <input
+                        type="password"
+                        placeholder="OPERATOR TOKEN…"
+                        value={opTok}
+                        onChange={(e) => setOpTok(e.target.value.trim())}
+                        style={{ flex: 1, minWidth: 0 }}
+                      />
+                      {opSaved ? (
+                        <button
+                          className="bevel-btn b-sm"
+                          style={{ color: 'var(--red)' }}
+                          onClick={() => {
+                            clearBpOperatorToken()
+                            setOpSaved(false)
+                            setOpTok('')
+                            play('click')
+                          }}
+                        >
+                          ⏏
+                        </button>
+                      ) : (
+                        <button
+                          className="bevel-btn b-sm b-cyan"
+                          disabled={!opTok}
+                          onClick={() => {
+                            saveBpOperatorToken(opTok)
+                            setOpSaved(true)
+                            play('coin')
+                            void statusQ.refetch()
+                            void balQ.refetch()
+                            void rfqQ.refetch()
+                          }}
+                        >
+                          ✓
+                        </button>
+                      )}
+                    </div>
+                  ) : null}
                 </>
               ) : null}
 
@@ -257,9 +301,9 @@ export function StockWindow() {
               />
               <button
                 className="bevel-btn b-lg"
-                disabled={!keyed || busy || !qty}
+                disabled={!keyed || !opOk || busy || !qty}
                 onClick={() => {
-                  if (!selected || !keyed) return
+                  if (!selected || !keyed || !opOk) return
                   setBusy(true)
                   setNote(null)
                   play('launch')
@@ -277,7 +321,7 @@ export function StockWindow() {
                     .finally(() => setBusy(false))
                 }}
               >
-                {busy ? 'SIGNING…' : keyed ? `REQUEST QUOTE — ${side === 'Bid' ? 'BUY' : 'SELL'}` : 'REQUEST QUOTE — KEY NOT LOADED'}
+                {busy ? 'SIGNING…' : !keyed ? 'REQUEST QUOTE — KEY NOT LOADED' : !opOk ? 'REQUEST QUOTE — OPERATOR TOKEN NEEDED' : `REQUEST QUOTE — ${side === 'Bid' ? 'BUY' : 'SELL'}`}
               </button>
               {note ? <div className="faint" style={{ fontSize: 15, color: 'var(--amber)' }}>{note}</div> : null}
               {(rfqQ.data ?? []).length > 0 ? (

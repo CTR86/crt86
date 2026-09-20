@@ -35,6 +35,8 @@ console.log('memeCount:', count)
 for (let i = Number(count) - 1; i >= Number(count) - 8; i--) {
   const token = await readContract(client, { address: MEME_FACTORY, abi: FACTORY_ABI, functionName: 'memeTokens', args: [BigInt(i)] })
   const m = await readContract(client, { address: MEME_FACTORY, abi: FACTORY_ABI, functionName: 'getMeme', args: [token] })
+  // debug script: subjectId/creator logged selectively below
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [subjectId, tokenAddr, curve, creator] = m
   const symbol = await readContract(client, { address: tokenAddr, abi: ERC20_ABI, functionName: 'symbol' })
   const decimals = await readContract(client, { address: tokenAddr, abi: ERC20_ABI, functionName: 'decimals' })

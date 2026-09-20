@@ -70,7 +70,7 @@ export function SettingsWindow() {
             </div>
             <div className="stat-row">
               <span className="sk">MODULES</span>
-              <span className="sv">LAUNCHPAD ✓ · DEX SOON · BRIDGE SOON · TERMINAL SOON</span>
+              <span className="sv">LAUNCHPAD ✓ · SWAPS ✓ · PERPS ✓ · BRIDGE ✓ · TERMINAL ✓</span>
             </div>
           </div>
 

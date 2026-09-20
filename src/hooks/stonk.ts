@@ -18,10 +18,16 @@ import {
 } from '../lib/stonkfun'
 
 export function useTokens(params: Parameters<typeof getTokens>[0], opts?: Partial<UseQueryOptions<TokensData>>) {
+  const isNewest = params.sort === 'newest'
   return useQuery<TokensData>({
     queryKey: ['sf-tokens', params],
     queryFn: () => getTokens(params),
-    refetchInterval: 10_000,
+    // Newest feed must feel "as it launches" — poll twice as fast and
+    // mark stale immediately so mounts + window focus always refetch.
+    refetchInterval: isNewest ? 5_000 : 10_000,
+    staleTime: 0,
+    refetchOnWindowFocus: true,
+    refetchIntervalInBackground: true,
     ...opts,
   })
 }

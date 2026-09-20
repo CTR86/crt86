@@ -27,7 +27,7 @@ function PriceBadge({ p }: { p: PerpPrice | undefined }) {
   )
 }
 
-export function PerpWindow() {
+export function JupPerpWindow() {
   const nav = useNavigate()
   const sol = useSolanaWallet()
   const openWalletHelp = useUi((s) => s.openWalletHelp)

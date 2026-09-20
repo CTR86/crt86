@@ -182,7 +182,7 @@ export function TradeTerminal() {
     } finally {
       setQuoting(false)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [mode, sel, amountIn, slippage])
 
   useEffect(() => {

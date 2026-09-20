@@ -56,6 +56,7 @@ export function usePerpInvalidate() {
 export function usePerpTx() {
   return useMutation({
     mutationFn: async (_args: unknown) => {
+      void _args
       throw new Error('Use direct transaction builders in the window (keeps wallet signing explicit).')
     },
   })

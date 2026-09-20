@@ -17,9 +17,12 @@ const FILES: OsFile[] = [
   { exe: 'LAUNCHPAD.EXE', icon: '🚀', route: '/launchpad', ready: true, desc: 'Multi-engine coin launcher' },
   { exe: 'MONEY.EXE', icon: '💰', route: '/money', ready: true, desc: 'Official coin — contract address' },
   { exe: 'STOCK.EXE', icon: '📊', route: '/stock', ready: true, desc: 'Backpack tokenized stocks — tape' },
-  { exe: 'PERP.EXE', icon: '📈', route: '/perp', ready: false, desc: 'Jupiter Perps — long/short SOL/ETH/WBTC' },
-  { exe: 'GACHA.EXE', icon: '🎰', route: '/gacha', ready: false, desc: 'On-chain gacha — pull, reveal, flex' },
-  { exe: 'DEX.EXE', icon: '💱', route: '/dex', ready: true, desc: 'Jupiter-powered Solana swaps' },
+  { exe: 'PERP.EXE', icon: '📈', route: '/perp', ready: true, desc: 'Perps — Hyperliquid + Aster, long/short with leverage' },
+  { exe: 'PREDICT.EXE', icon: '🔮', route: '/predict', ready: true, desc: 'Prediction markets — Polymarket + Kalshi' },
+  { exe: 'JUP.EXE', icon: '💱', route: '/jup', ready: true, desc: 'Jupiter-powered Solana swaps' },
+  { exe: 'UNISWAP.EXE', icon: '🦄', route: '/uniswap', ready: true, desc: 'Uniswap API swaps · BNB, ETH, Base + more' },
+  { exe: 'PANCAKE.EXE', icon: '🥞', route: '/pancake', ready: true, desc: 'PancakeSwap swaps · BNB Chain first' },
+  { exe: 'LEND.EXE', icon: '🏦', route: '/lend', ready: true, desc: 'Jupiter Lend — earn yield + borrow' },
   { exe: 'BRIDGE.EXE', icon: '🌉', route: '/bridge', ready: true, desc: 'Cross-chain bridge · Relay' },
   { exe: 'TERMINAL.EXE', icon: '📟', route: '/terminal', ready: true, desc: 'Market wire — glaze the movers' },
   { exe: 'FAQ.TXT', icon: '📄', route: '/faq', ready: true, desc: 'Read the manual' },
@@ -27,6 +30,7 @@ const FILES: OsFile[] = [
   { exe: 'X.EXE', icon: '𝕏', route: '/x', ready: true, desc: '@crt86vibe' },
   { exe: 'GITHUB.EXE', icon: '🐙', route: '/github', ready: true, desc: 'CTR86/crt86 — source' },
   { exe: 'SNAKE.EXE', icon: '🐍', route: '/snake', ready: true, desc: 'Wire worm — eat bytes, beat your best' },
+  { exe: 'SHOOT.EXE', icon: '🛸', route: '/shoot', ready: true, desc: 'Star ranger — blast the swarm, beat your best' },
   { exe: 'SETTINGS.EXE', icon: '⚙️', route: '/settings', ready: true, desc: 'CRT · SFX · night mode' },
 ]
 
@@ -37,7 +41,7 @@ function clockString(d: Date): string {
 /* CRT-DOS 6.86 desktop — file icons; double-click on desktop, single tap on mobile */
 export function Desktop() {
   const nav = useNavigate()
-  const { address, available } = useSolanaWallet()
+  const { address, available, walletName } = useSolanaWallet()
   const [selected, setSelected] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
   const [clock, setClock] = useState(() => new Date())
@@ -121,7 +125,7 @@ export function Desktop() {
             style={address ? {} : { background: available ? 'var(--amber)' : '#2c1f45', boxShadow: available ? 'var(--glow-amber)' : 'none', animation: 'none' }}
             title={address ? 'Solana wallet connected' : available ? 'Wallet detected — connect it' : 'No wallet installed'}
           />
-          {address ? `PHANTOM ${address.slice(0, 4)}…` : available ? 'WALLET: NOT CONNECTED' : 'NO WALLET'}
+          {address ? `${walletName ?? 'WALLET'} ${address.slice(0, 4)}…` : available ? 'WALLET: NOT CONNECTED' : 'NO WALLET'}
         </span>
         {OFFICIAL_CA.trim() !== '' && (
           <span

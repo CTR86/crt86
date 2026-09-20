@@ -5,7 +5,6 @@ import { CrtShell } from './design/CrtShell'
 import { OsBoot } from './os/OsBoot'
 import { Desktop } from './os/Desktop'
 import { ModuleLoader } from './os/ModuleLoader'
-import { ComingSoon } from './os/ComingSoon'
 import { BridgeWindow } from './os/BridgeWindow'
 import { FaqWindow } from './os/FaqWindow'
 import { TerminalWindow } from './os/TerminalWindow'
@@ -15,8 +14,14 @@ import { XWindow } from './os/XWindow'
 import { GitHubWindow } from './os/GitHubWindow'
 import { StockWindow } from './os/StockWindow'
 import { MoneyWindow } from './os/MoneyWindow'
+import { PerpTradeWindow } from './os/PerpTradeWindow'
+import { PredictWindow } from './os/PredictWindow'
 import { DexWindow } from './os/DexWindow'
+import { UniswapWindow } from './os/UniswapWindow'
+import { PancakeWindow } from './os/PancakeWindow'
+import { LendWindow } from './os/LendWindow'
 import { SnakeWindow } from './os/SnakeWindow'
+import { ShootWindow } from './os/ShootWindow'
 import { ErrorBoundary } from './design/ErrorBoundary'
 import { MobileNotice } from './design/MobileNotice'
 import { WalletHelpDialog } from './design/WalletHelpDialog'
@@ -106,11 +111,17 @@ function AppRoutes() {
         <Route path="/stock" element={<LaunchpadModule><StockWindow /></LaunchpadModule>} />
         <Route path="/money" element={<LaunchpadModule><MoneyWindow /></LaunchpadModule>} />
         <Route path="/snake" element={<LaunchpadModule><SnakeWindow /></LaunchpadModule>} />
-        <Route path="/perp" element={<ComingSoon exe="PERP.EXE" icon="📈" title="PERPETUALS" desc="Jupiter Perps inside the CRT — long/short SOL, ETH, WBTC with leverage. Keeper-fulfilled, oracle-priced. Engine parked until launch." />} />
-        <Route path="/gacha" element={<ComingSoon exe="GACHA.EXE" icon="🎰" title="GACHA TERMINAL" desc="On-chain gacha pulls — capsules, odds, reveals and rarity flex. Feed the machine, chase the holographic." />} />
+        <Route path="/shoot" element={<LaunchpadModule><ShootWindow /></LaunchpadModule>} />
+        <Route path="/perp" element={<LaunchpadModule><PerpTradeWindow /></LaunchpadModule>} />
+        <Route path="/predict" element={<LaunchpadModule><PredictWindow /></LaunchpadModule>} />
         <Route path="/settings" element={<LaunchpadModule><SettingsWindow /></LaunchpadModule>} />
         <Route path="/launchpad/trade" element={RH_ENABLED ? <LaunchpadModule><TradeTerminal /></LaunchpadModule> : <Navigate to="/launchpad" replace />} />
-        <Route path="/dex" element={<LaunchpadModule><DexWindow /></LaunchpadModule>} />
+        <Route path="/jup" element={<LaunchpadModule><DexWindow /></LaunchpadModule>} />
+        {/* legacy route — DEX.EXE was renamed to JUP.EXE */}
+        <Route path="/dex" element={<Navigate to="/jup" replace />} />
+        <Route path="/uniswap" element={<LaunchpadModule><UniswapWindow /></LaunchpadModule>} />
+        <Route path="/pancake" element={<LaunchpadModule><PancakeWindow /></LaunchpadModule>} />
+        <Route path="/lend" element={<LaunchpadModule><LendWindow /></LaunchpadModule>} />
         <Route path="/bridge" element={<LaunchpadModule><BridgeWindow /></LaunchpadModule>} />
         <Route path="/terminal" element={<LaunchpadModule><TerminalWindow /></LaunchpadModule>} />
         <Route path="/launch" element={<Navigate to="/launchpad/launch" replace />} />
