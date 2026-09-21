@@ -2,7 +2,7 @@
 
 > **CRT-DOS 6.86** — Launch, trade, bridge and play without leaving the terminal. Retro by design, Solana-native by execution. Live at **https://www.crt86.com**.
 
-CA : Dbjy6uN3DNxn1NdnM1sKrMXb5XXkuWrM5yuL1PqDpump
+CA :
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-pink.svg)
 ![Build](https://img.shields.io/badge/build-vite%20%2B%20react%2019-cyan)
